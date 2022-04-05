@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(lab1)
+project(lab2)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -fpermissive ${CMAKE_CXX_FLAGS} -Wfatal-errors\ ")
 
@@ -10,12 +10,13 @@ find_package(
   roscpp 
   std_msgs
   geometry_msgs
-  turtlesim
+  tf2
+  tf2_ros
 )
 
 catkin_package(
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS roscpp std_msgs std_srvs geometry_msgs  
+  CATKIN_DEPENDS roscpp std_msgs std_srvs geometry_msgs tf2 tf2_ros
 )
 
 include_directories(
@@ -23,5 +24,5 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(square_control src/square_control.cpp)
-target_link_libraries(square_control ${catkin_LIBRARIES})
+add_executable(robot_control src/robot_control.cpp)
+target_link_libraries(robot_control ${catkin_LIBRARIES})

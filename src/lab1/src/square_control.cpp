@@ -32,6 +32,9 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Pose2D.h>
 
+#include <square_control/util.h>
+#include <square_control/velocity_profile.h>
+
 namespace square_control
 {
 
@@ -64,7 +67,7 @@ private:
     bool prev_active = p_active_;
 
     nh_local_.param<bool>("active", p_active_, true);
-
+    nh_local_.param<double>("beacon_1_y", p_tol_alpha_, 0.1);
     if (p_active_ != prev_active)
     {
       if (p_active_)
@@ -78,6 +81,9 @@ private:
         pub_twist_.shutdown();
       }
     }
+    angular_vel.setVConstrain(0.15, 0.1, 0.1, 2.0);
+    angular_vel.setAConstrain(0.1, 0.1);
+    angular_vel.setDT(1.0 / 60.0);
     goals_.clear();
     geometry_msgs::Pose2D goal;
     goal.x = 1.0;
@@ -117,35 +123,79 @@ private:
     goal.y = goals_[idx_goals_].y;
     goal.theta = goals_[idx_goals_].theta;
 
-    float rho = sqrt(pow(goal.x - input_pose_.x, 2) + pow(goal.y - input_pose_.y, 2));
-    float alpha = atan2(goals_[idx_goals_].y - input_pose_.y, goals_[idx_goals_].x - input_pose_.x) - input_pose_.theta;
-    // float beta = -alpha - input_pose_.theta;
-    float beta = goal.theta - input_pose_.theta;
+    double rho = util::length(goal, input_pose_);
+    double alpha = atan2(goals_[idx_goals_].y - input_pose_.y, goals_[idx_goals_].x - input_pose_.x) - input_pose_.theta;
+    // double beta = goal.theta - alpha - input_pose_.theta;
+    double beta = goal.theta - input_pose_.theta;
 
-    alpha = normoalizeAngel(alpha);
-    beta = normoalizeAngel(beta);
+    alpha = util::normoalizeAngle(alpha);
+    beta = util::normoalizeAngle(beta);
 
     switch (actionstate_)
     {
       case ActionState::Aim: {
-        if (abs(alpha) < 0.01)
+        if (abs(alpha) < p_tol_alpha_)
         {
           actionstate_ = ActionState::Move;
           break;
         }
+
         output_twist_.linear.x = 0.0;
-        output_twist_.angular.z = alpha * 20.0;
+        if (alpha > 0)
+        {
+          output_twist_.angular.z = angular_vel.getVelocity(alpha, output_twist_.angular.z);
+        }
+        else
+        {
+          output_twist_.angular.z = -angular_vel.getVelocity(alpha, output_twist_.angular.z);
+        }
       }
       break;
-      
+
       case ActionState::Move: {
         if (abs(rho) < 0.01)
         {
           actionstate_ = ActionState::Rotate;
           break;
         }
-        output_twist_.linear.x = rho * 5;
-        output_twist_.angular.z = alpha * 10;
+        // forward
+        if (alpha > -M_PI_2 && alpha < M_PI_2)
+        {
+          if (abs(rho) < pow(output_twist_.linear.x, 2.0) * 0.2)
+          {
+            output_twist_.linear.x -= 0.1;
+          }
+          else
+          {
+            output_twist_.linear.x += 0.1;
+          }
+        }
+        // backward
+        else
+        {
+          if (abs(rho) < pow(output_twist_.linear.x, 2.0) * 0.2)
+          {
+            output_twist_.linear.x += 0.1;
+          }
+          else
+          {
+            output_twist_.linear.x -= 0.1;
+          }
+        }
+
+        if (abs(rho) < pow(output_twist_.linear.x, 2.0) * 0.2)
+        {
+          if (alpha > -M_PI_2 && alpha < M_PI_2)
+          {
+            output_twist_.linear.x -= 0.1;
+          }
+          else
+          {
+            output_twist_.linear.x += 0.1;
+          }
+        }
+        output_twist_.linear.x += 0.1;
+        output_twist_.angular.z = alpha * 1;
       }
       break;
 
@@ -155,8 +205,30 @@ private:
           actionstate_ = ActionState::Reached;
           break;
         }
+
         output_twist_.linear.x = 0.0;
-        output_twist_.angular.z = beta * 10.0;
+        if (beta > 0)
+        {
+          if (abs(beta) < pow(output_twist_.angular.z, 2.0) * 0.2)
+          {
+            output_twist_.angular.z -= 0.1;
+          }
+          else
+          {
+            output_twist_.angular.z += 0.1;
+          }
+        }
+        else
+        {
+          if (abs(beta) < pow(output_twist_.angular.z, 2.0) * 0.2)
+          {
+            output_twist_.angular.z += 0.1;
+          }
+          else
+          {
+            output_twist_.angular.z -= 0.1;
+          }
+        }
       }
       break;
 
@@ -172,49 +244,34 @@ private:
       }
       break;
     }
-    std::scientific;
-    std::setw(10);
-    // std::cout << "x:" << std::setw(10) << std::setprecision(3) << input_pose_.x << ", y:" << std::setw(10) << std::setprecision(3) << input_pose_.y << ", t:" << std::setw(10) <<
-    // std::setprecision(3)
-    //           << input_pose_.theta << ", r: " << std::setw(10) << std::setprecision(5) << rho << ", a: " << std::setw(10) << std::setprecision(3) << alpha << ", b: " << std::setw(10)
-    //           << std::setprecision(3) << beta << ", x:" << std::setw(10) << std::setprecision(3) << output_twist_.linear.x << ", w:" << std::setw(10) << std::setprecision(3) <<
-    //           output_twist_.angular.z
-    //           << std::endl;
+    std::cout.scientific;
+    std::cout << std::scientific;
+    std::cout << "x:" << std::setw(10) << std::setprecision(3) << input_pose_.x << ", y:" << std::setw(10) << std::setprecision(3) << input_pose_.y << ", t:" << std::setw(10) << std::setprecision(3)
+              << input_pose_.theta << ", r: " << std::setw(10) << std::setprecision(5) << rho << ", a: " << std::setw(10) << std::setprecision(3) << alpha << ", b: " << std::setw(10)
+              << std::setprecision(3) << beta << ", x:" << std::setw(10) << std::setprecision(3) << output_twist_.linear.x << ", w:" << std::setw(10) << std::setprecision(3) << output_twist_.angular.z
+              << std::endl;
     publishTwish();
   }
 
   void publishTwish()
   {
-    if (output_twist_.linear.x > 20.0)
+    if (output_twist_.linear.x > 2.0)
     {
-      output_twist_.linear.x = 20.0;
+      output_twist_.linear.x = 2.0;
     }
-    else if (output_twist_.linear.x < -20.0)
+    else if (output_twist_.linear.x < -2.0)
     {
-      output_twist_.linear.x = -20.0;
+      output_twist_.linear.x = -2.0;
     }
-    if (output_twist_.angular.z > 20.0)
+    if (output_twist_.angular.z > 2.0)
     {
-      output_twist_.angular.z = 20.0;
+      output_twist_.angular.z = 2.0;
     }
-    else if (output_twist_.angular.z < -20.0)
+    else if (output_twist_.angular.z < -2.0)
     {
-      output_twist_.angular.z = -20.0;
+      output_twist_.angular.z = -2.0;
     }
     pub_twist_.publish(output_twist_);
-  }
-
-  double normoalizeAngel(double a)
-  {
-    if (a > M_PI)
-    {
-      return (a - 2.0 * M_PI);
-    }
-    else if (a < -M_PI)
-    {
-      return (a + 2.0 * M_PI);
-    }
-    return fmod(a + M_PI, 2.0 * M_PI) - M_PI;
   }
 
   ros::NodeHandle nh_;
@@ -229,16 +286,19 @@ private:
   int idx_goals_;
   int idx_goals_next_;
   ActionState actionstate_;
-
+  velocity_profile::VelocityProfile linear_vel;
+  velocity_profile::VelocityProfile angular_vel;
   /* ros param */
   bool p_active_;
   double p_tol_alpha_;
   double p_tol_rho_;
   double p_tol_beta_;
-  double p_gain_rot_alpha_;
-  double p_gain_mov_rho_;
-  double p_gain_mov_alpha_;
+  double p_rot_acc_;
+  double p_rot_dcc_;
+  double p_lin_acc_;
+  double p_lin_dcc_;
 };
+
 }  // namespace  square_control
 
 int main(int argc, char** argv)
