@@ -1,0 +1,31 @@
+<launch>
+  <arg name="namespace" default="robot1"/>
+
+  <node ns="$(arg namespace)" pkg="tf" type="static_transform_publisher" name="tf1" args="0 0 0.095 0 0 0 $(arg namespace)/base_footprint $(arg namespace)/base_link 50"/>
+  <node ns="$(arg namespace)" pkg="tf" type="static_transform_publisher" name="tf2" args="0.15 0 0.1 1.57 0 0 $(arg namespace)/base_link $(arg namespace)/laser 50"/>
+
+  <node ns="$(arg namespace)" name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+  	<param name="serial_port"         type="string" value="/dev/ttyUSB0"/>
+  	<param name="serial_baudrate"     type="int"    value="115200"/><!--A1/A2 -->
+  <!--param name="serial_baudrate"     type="int"    value="256000"--><!--A3 -->
+  	<param name="frame_id"            type="string" value="$(arg namespace)/laser"/>
+  	<param name="inverted"            type="bool"   value="false"/>
+  	<param name="angle_compensate"    type="bool"   value="true"/>
+  </node>
+
+  <node ns="$(arg namespace)" pkg="simulation_env" name="Interface" type="Interface.py" output='screen'>
+  	<remap from="/cmd_vel" to="/$(arg namespace)/cmd_vel"/>
+  </node>
+  <node ns="$(arg namespace)" pkg="simulation_env" name="odom_pub" type="tf_pos_ns" output='screen'>
+	<param name="Name"            type="string" value="$(arg namespace)"/>
+        <remap from="/$(arg namespace)/odom_pub/FeedBack_Vel" to="/$(arg namespace)/FeedBack_Vel"/>
+  </node>
+	
+  <node ns="$(arg namespace)" pkg="simulation_env" name="pose_pub" type="tf_subscribe_ns">
+	<param name="Name"            type="string" value="$(arg namespace)"/>
+  </node>
+  <node ns="$(arg namespace)" pkg="simulation_env" name="path_pub" type="path_pub.py">
+	<remap from="/robot_pose" to="/$(arg namespace)/robot_pose"/>
+  </node>
+
+</launch>

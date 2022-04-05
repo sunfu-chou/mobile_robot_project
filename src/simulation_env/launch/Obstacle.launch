@@ -1,0 +1,40 @@
+<launch>
+  	
+
+  <arg name="model" default="$(find simulation_env)/urdf/minicar_description/moving_obs_2.xacro"/>
+
+  <group ns="obs1">
+
+  	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model) ns:=obs1"/>
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+        args="-x 4.3 -y -1.15 -z 1.2 -R 1.57 -unpause -urdf -model obs1 -param robot_description" respawn="false" output="screen" />
+
+
+  	<node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
+    	    <param name="publish_frequency" type="double" value="30.0" />	
+	    <param name="tf_prefix" type="string" value="obs1" />
+  	</node>
+
+  	<rosparam command="load"
+            file="$(find simulation_env)/config/joint.yaml"
+            ns="obs1/joint_state_controller" />
+  	<rosparam command="load"
+            file="$(find simulation_env)/config/diffdrive.yaml"
+            ns="obs1/diffdrive_controller" />
+
+  	<node name="controller_spawner" pkg="controller_manager" type="spawner"
+    		args="joint_state_controller
+          		diffdrive_controller
+          		--shutdown-timeout 3"/>
+
+    	<node pkg="simulation_env" name="obs_vel" type="obs_vel_cmd_2.py">
+		<remap from="/cmd_vel" to="/obs1/cmd_vel"/>
+	</node> 
+  </group>
+
+       
+
+
+</launch>

@@ -1,0 +1,26 @@
+<launch>
+  <arg name="namespace" default="robot1"/>
+  <group ns="$(arg namespace)">	
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+    <param name="tf_prefix" type="string" value="$(arg namespace)" />	
+    <param name="base_global_planner" value="navfn/NavfnROS" />
+
+    <param name="planner_frequency"  value="2" />
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+    
+    <rosparam file="$(find simulation_env)/launch/params/global_costmap_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find simulation_env)/launch/params/local_costmap_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find simulation_env)/launch/params/dwa_base_local_planner_params.yaml" command="load" />
+    <param name="base_frame_id" value="$(arg namespace)/base_footprint"/>
+    <param name="robot_base_frame" value="$(arg namespace)/base_footprint"/>
+    <param name="local_costmap/robot_base_frame" value="$(arg namespace)/base_footprint"/>
+    <param name="global_costmap/robot_base_frame" value="$(arg namespace)/base_footprint"/>
+    <param name="global_costmap/laser_scan_sensor/sensor_frame" value="$(arg namespace)/laser"/>
+    <param name="global_costmap/laser_scan_sensor/topic" value="/$(arg namespace)/scan"/>
+    <param name="local_costmap/laser_scan_sensor/sensor_frame" value="$(arg namespace)/laser"/>
+    <param name="local_costmap/laser_scan_sensor/topic" value="/$(arg namespace)/scan"/>
+    <param name="local_costmap/obstacle_layer/laser_scan_sensor/sensor_frame" value="$(arg namespace)/laser"/>
+    <param name="local_costmap/obstacle_layer/laser_scan_sensor/topic" value="/$(arg namespace)/scan"/>
+  </node>
+  </group>
+</launch>

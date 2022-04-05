@@ -1,0 +1,54 @@
+<launch>
+  <arg name="namespace" default="robot1"/>
+  
+  <arg name="map_file" default="$(find simulation_env)/map/Final_ver2.yaml"/>
+  <node ns="$(arg namespace)" pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <!-- amcl node -->
+  <node ns="$(arg namespace)" pkg="amcl" type="amcl" name="amcl">
+	<remap from="/scan" to="/$(arg namespace)/scan"/>
+	<param name="odom_frame_id" value="$(arg namespace)/odom"/>
+	<param name="base_frame_id" value="$(arg namespace)/base_link"/>
+	  <!-- Publish scans from best pose at a max of 10 Hz -->
+	<param name="use_map_topic" value="true"/>
+	<param name="odom_model_type" value="diff"/>
+	<param name="odom_alpha5" value="0.1"/>
+	<param name="transform_tolerance" value="0.5" />
+	<param name="gui_publish_rate" value="10.0"/>
+	<param name="laser_max_beams" value="300"/>
+	<param name="min_particles" value="500"/>
+	<param name="max_particles" value="5000"/>
+	<param name="kld_err" value="0.1"/>
+	<param name="kld_z" value="0.99"/>
+	<!-- translation std dev, m -->
+	<param name="odom_alpha1" value="0.3"/>
+	<param name="odom_alpha2" value="0.3"/>
+	<param name="odom_alpha3" value="0.3"/>
+	<param name="odom_alpha4" value="0.3"/>
+	<param name="laser_z_hit" value="0.9"/>
+	<param name="laser_z_short" value="0.05"/>
+	<param name="laser_z_max" value="0.05"/>
+	<param name="laser_z_rand" value="0.5"/>
+	<param name="laser_sigma_hit" value="0.2"/>
+	<param name="laser_lambda_short" value="0.1"/>
+	<param name="laser_lambda_short" value="0.1"/>
+	<param name="laser_model_type" value="likelihood_field"/>
+	<!-- <param name="laser_model_type" value="beam"/> -->
+	<param name="laser_min_range" value="1"/>
+	<param name="laser_max_range" value="5"/>
+	<param name="laser_likelihood_max_dist" value="2.0"/>
+	<param name="update_min_d" value="0.2"/>
+	<param name="update_min_a" value="0.5"/>
+	<param name="resample_interval" value="1"/>
+	<param name="transform_tolerance" value="0.1"/>
+	<param name="recovery_alpha_slow" value="0.0"/>
+	<param name="recovery_alpha_fast" value="0.0"/>
+	<param name="initial_pose_x" value="1.0"/>
+	<param name="initial_pose_y" value="-2.5"/>
+	<param name="initial_pose_a" value="3.1415926"/>
+	</node>
+  <node pkg="rviz" type="rviz" name="rviz_$(arg namespace)" output="screen" args="-d $(find simulation_env)/rviz_config/$(arg namespace).rviz">
+	<remap from="/move_base_simple/goal" to="/$(arg namespace)/move_base_simple/goal"/>
+	<remap from="/initialpose" to="/$(arg namespace)/initialpose"/>
+  </node>
+</launch>

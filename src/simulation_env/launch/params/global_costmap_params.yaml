@@ -1,0 +1,35 @@
+# "plugins" for post-Hydro setting
+plugins:
+    - {name: static_layer,          type: "costmap_2d::StaticLayer"}
+    - {name: obstacle_layer,        type: "costmap_2d::ObstacleLayer"} # VoxelLayer
+    - {name: inflation_layer,       type: "costmap_2d::InflationLayer"}
+
+update_frequency: 10.0
+publish_frequency: 5.0
+
+global_frame: map
+robot_base_frame: base_footprint
+# static_map: true
+rolling_window: false
+transform_tolerance: 1.0
+
+footprint: [[0.2, -0.2] , [0.2, 0.15], [-0.2, 0.15], [-0.2, -0.2]]
+
+static_layer:
+    first_map_only: false
+    track_unknown_space: true
+    trinary_costmap: true
+
+obstacle_layer:
+    obstacle_range: 3.0
+    raytrace_range: 3.0 # 15.0
+    ray_trace_reduction_ratio: 0.90 # max: 1.0
+    # Sensors
+
+observation_sources: laser_scan_sensor
+
+laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: scan, marking: true, clearing: true}
+
+inflation_layer:
+    inflation_radius: 0.5 # 0.25 #4.0 #1.0 #0.25
+    cost_scaling_factor: 14.0 #10.0 #8.0 #10.0
