@@ -1,3 +1,37 @@
+<!-- <launch>
+  <include file="$(find simulation_env)/launch/A_star_map.launch" />
+  <node pkg="lab3" name="lab3" type="lab3" output="screen" />
+  <node pkg="move_base" type="move_base" name="move_base" output="screen">
+    <rosparam>
+    global_costmap:
+      plugins:
+        - {name: static_layer, type: "costmap_2d::StaticLayer"}
+        - {name: inflater_layer, type: "costmap_2d::InflationLayer"}
+      inflater_layer:
+        inflation_radius: 0.3
+        cost_scaling_factor: 0.0
+      update_frequency: 2.0
+      publish_frequency: 2.0
+    </rosparam>
+  </node>
+</launch> -->
+
 <launch>
-  <include file="$(find simulation_env)/launch/A_star_map.launch"/>
+  <include file="$(find simulation_env)/launch/A_star_map.launch" />
+  <node pkg="lab3" name="lab3" type="lab3" output="screen" />
+  <node pkg="costmap_2d" type="costmap_2d_node" name="costmap_node" output="screen" clear_params="true">
+    <rosparam>
+      costmap:
+        plugins:
+          - {name: static_layer, type: "costmap_2d::StaticLayer"}
+          - {name: inflater_layer, type: "costmap_2d::InflationLayer"}
+        update_frequency: 30
+        publish_frequency: 30
+        inflater_layer:
+          inflation_radius: 0.3
+          cost_scaling_factor: 0.0
+    </rosparam>
+    <remap from="costmap_node/costmap/costmap" to="map_inflated"/>
+    <remap from="costmap_node/costmap/costmap_updates" to="map_inflated_updates"/>
+  </node>
 </launch>
