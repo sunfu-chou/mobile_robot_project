@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(lab3)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -fpermissive ${CMAKE_CXX_FLAGS} -Wfatal-errors\ ")
+set(CMAKE_CXX_FLAGS "-std=c++14 -fpermissive ${CMAKE_CXX_FLAGS} -Wfatal-errors\ ")
 
 find_package(
   catkin
@@ -23,8 +23,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(a_star src/a_star.cpp)
-target_link_libraries(a_star ${catkin_LIBRARIES})
+# add_library(a_star src/a_star.cpp)
+# target_link_libraries(a_star ${catkin_LIBRARIES})
 
 add_executable(lab3 src/main.cpp)
-target_link_libraries(lab3 a_star)
+target_link_libraries(lab3 ${catkin_LIBRARIES})

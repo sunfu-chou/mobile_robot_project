@@ -1,0 +1,5 @@
+obstacle_range: 0.5
+robot_radius: 0.5
+inflation_radius: 0.4
+
+cost_scaling_factor: 0.01

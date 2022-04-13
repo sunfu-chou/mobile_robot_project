@@ -26,7 +26,9 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <queue>
 #include <vector>
+#include <utility>
 
 #include <ros/ros.h>
 
@@ -38,24 +40,28 @@
 namespace a_star
 {
 
+typedef std::pair<int, int> Coord;
 struct Node
 {
   double F, G, H;
-  geometry_msgs::Pose2D coord;
-  Node* parent;
-  Node(geometry_msgs::Pose2D coord_, Node* parent_ = nullptr) : coord(coord_), parent(parent_), G(0.0), H(0.0)
+  Coord coord;
+  Coord* parent;
+
+  Node(Coord coord_, Coord* parent_) : coord(Coord(0, 0)), parent(parent_), G(0.0), H(0.0)
   {
   }
 
-  Node(geometry_msgs::PoseStamped coord_, Node* parent_ = nullptr) : parent(parent_), G(0.0), H(0.0)
+  Node(Coord coord_) : coord(coord_), parent(nullptr), G(0.0), H(0.0)
   {
-    coord.x = coord_.pose.position.x;
-    coord.y = coord_.pose.position.y;
   }
 
-  inline bool operator<(const Node& rhs)
+  Node(Node node_) : coord(node_.coord), parent(nullptr), G(0.0), H(0.0)
   {
-    return F < rhs.F;
+  }
+
+  friend bool operator>(const Node& n1, const Node& n2)
+  {
+    return n2.F > n2.F;
   }
 };
 
@@ -67,12 +73,14 @@ public:
   AStar(nav_msgs::OccupancyGrid map) : map_(map)
   {
   }
+
   ~AStar()
   {
   }
 
 private:
-  bool calcPath(geometry_msgs::PoseStamped src, geometry_msgs::PoseStamped des, nav_msgs::Path& path);
+  bool calcPath(Coord src, Coord des, nav_msgs::Path& path);
+  bool isValid(Coord coord);
 
   nav_msgs::OccupancyGrid map_;
 };
