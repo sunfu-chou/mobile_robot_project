@@ -1,0 +1,67 @@
+<!-- <launch>
+  <include file="$(find simulation_env)/launch/A_star_map.launch" />
+  <node pkg="lab3" name="lab3" type="lab3" output="screen" />
+  <node pkg="costmap_2d" type="costmap_2d_node" name="costmap_node" output="screen" clear_params="true">
+    <rosparam>
+      costmap:
+        plugins:
+          - {name: static_layer, type: "costmap_2d::StaticLayer"}
+          - {name: inflater_layer, type: "costmap_2d::InflationLayer"}
+        update_frequency: 30
+        publish_frequency: 30
+        inflater_layer:
+          inflation_radius: 0.3
+          cost_scaling_factor: 0.0
+    </rosparam>
+    <remap from="costmap_node/costmap/costmap" to="map_inflated" />
+    <remap from="costmap_node/costmap/costmap_updates" to="map_inflated_updates" />
+  </node>
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find lab3)/rviz/default.rviz" />
+  <node name="hybrid_astar" pkg="hybrid_astar" type="hybrid_astar" output="screen">
+    <remap from="move_base_simple/start" to="start"/>
+    <remap from="move_base_simple/goal" to="goal"/>
+  </node>
+  <node name="map_to_path" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 map path"/>
+
+</launch> -->
+
+<launch>
+  <include file="$(find simulation_env)/launch/Base.launch" />
+  <include file="$(find simulation_env)/launch/amcl.launch" />
+  <arg name="model" default="$(find simulation_env)/urdf/minicar_description/minicar.xacro"/>
+  <!-- <node pkg="lab3" name="lab3" type="lab3" output="screen" /> -->
+  <!-- <node pkg="move_base" type="move_base" name="move_base" output="screen">
+    <rosparam>
+    global_costmap:
+      plugins:
+        - {name: static_layer, type: "costmap_2d::StaticLayer"}
+        - {name: inflater_layer, type: "costmap_2d::InflationLayer"}
+      inflater_layer:
+        inflation_radius: 0.3
+        cost_scaling_factor: 0.0
+      update_frequency: 2.0
+      publish_frequency: 2.0
+    </rosparam>
+  </node> -->
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+    <!-- costmap -->
+    <rosparam file="$(find lab3)/params/navigation/costmap/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find lab3)/params/navigation/costmap/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find lab3)/params/navigation/costmap/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find lab3)/params/navigation/costmap/local_costmap_params.yaml" command="load" />
+
+    <!-- movebase -->
+    <rosparam file="$(find lab3)/params/navigation/move_base_params.yaml" command="load" />
+
+    <!-- global planners -->
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+    <rosparam file="$(find lab3)/params/navigation/global_planner_params.yaml" command="load" />
+
+    <!-- local planners -->
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+    <rosparam file="$(find lab3)/params/navigation/local_planner/teb_local_planner_params.yaml" command="load" />
+  </node>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 1 map odom"/>
+
+</launch>

@@ -49,7 +49,7 @@ enum class ActionState
 class RobotControl
 {
 public:
-  RobotControl(ros::NodeHandle& nh, ros::NodeHandle& nh_local) : tf2_listener_(tf2_buffer_)
+  RobotControl(ros::NodeHandle& nh, ros::NodeHandle& nh_local) : nh_(nh), nh_local_(nh_local), tf2_listener_(tf2_buffer_)
   {
     p_active_ = false;
     action_state_ = ActionState::Reached;
@@ -69,6 +69,10 @@ private:
     bool prev_active = p_active_;
 
     nh_local_.param<bool>("active", p_active_, true);
+    nh_local_.param<double>("gain_rho", p_k_r_, 0.5);
+    nh_local_.param<double>("gain_alpha", p_k_a_, 1.5);
+    nh_local_.param<double>("gain_beta", p_k_b_, 0.6);
+
     if (p_active_ != prev_active)
     {
       if (p_active_)
@@ -83,6 +87,7 @@ private:
         pub_twist_.shutdown();
       }
     }
+    ROS_INFO("r:%f, a:%f, b:%f", p_k_r_, p_k_a_, p_k_b_);
     return true;
   }
 
@@ -160,45 +165,45 @@ private:
     switch (action_state_)
     {
       case ActionState::Move: {
-        if (rho_ < 0.02)
+        if (rho_ < 0.05)
         {
-          if (std::abs(theta_error_) < 0.05)
+          if (std::abs(theta_error_) < 0.09)
           {
             action_state_ = ActionState::Reached;
-            ROS_INFO("M2R");
+            // ROS_INFO("M2R");
             break;
           }
           else
           {
             action_state_ = ActionState::Rotate;
-            ROS_INFO("M2Ro");
+            // ROS_INFO("M2Ro");
             break;
           }
         }
-        output_twist_.linear.x = 0.6 * rho_;
-        output_twist_.angular.z = 2.5 * alpha_ - 1 * beta_;
-        ROS_INFO_STREAM("act: Move");
-        ROS_INFO("rho: %lf, alpha: %lf, beta: %lf", rho_, alpha_, beta_);
+        output_twist_.linear.x = p_k_r_ * rho_;
+        output_twist_.angular.z = p_k_a_ * alpha_ - p_k_b_ * beta_;
+        // ROS_INFO_STREAM("act: Move");
+        // ROS_INFO("rho: %lf, alpha: %lf, beta: %lf", rho_, alpha_, beta_);
         break;
       }
       case ActionState::Rotate: {
-        if (std::abs(theta_error_) < 0.05)
+        if (std::abs(theta_error_) < 0.09)
         {
           action_state_ = ActionState::Reached;
-          ROS_INFO("R2Ro");
+          // ROS_INFO("R2Ro");
           break;
         }
         output_twist_.linear.x = 0.0;
         output_twist_.angular.z = 1 * theta_error_;
-        ROS_INFO_STREAM("act: Rotate");
-        ROS_INFO("rho: %lf, alpha: %lf, beta: %lf", rho_, alpha_, beta_);
+        // ROS_INFO_STREAM("act: Rotate");
+        // ROS_INFO("rho: %lf, alpha: %lf, beta: %lf", rho_, alpha_, beta_);
         break;
       }
       case ActionState::Reached: {
         output_twist_.linear.x = 0.0;
         output_twist_.angular.z = 0.0;
-        ROS_INFO_STREAM("act: Reached");
-        ROS_INFO("rho: %lf, alpha: %lf, beta: %lf", rho_, alpha_, beta_);
+        // ROS_INFO_STREAM("act: Reached");
+        // ROS_INFO("rho: %lf, alpha: %lf, beta: %lf", rho_, alpha_, beta_);
         break;
       }
     }
@@ -231,6 +236,10 @@ private:
 
   /* ros param */
   bool p_active_;
+  double p_k_r_;
+  double p_k_a_;
+  double p_k_b_;
+
 };
 
 }  // namespace  square_control

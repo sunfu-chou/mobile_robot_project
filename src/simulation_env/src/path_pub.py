@@ -52,9 +52,6 @@ if __name__ == '__main__':
     rospy.init_node('robot_path_pub',anonymous=True)
     rate = rospy.Rate(10)
     sub = rospy.Subscriber("/robot_pose",Twist,Pose_CB)
-    try:
-        while not rospy.is_shutdown():
-            Pose_sample()
-            rate.sleep()
-    except rospy.exceptions.ROSInterruptException as e:
-        pass
+    while not rospy.is_shutdown():
+        Pose_sample()
+        rate.sleep()
