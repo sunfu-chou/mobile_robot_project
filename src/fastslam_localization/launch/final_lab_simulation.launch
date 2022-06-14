@@ -40,5 +40,10 @@
   <node pkg="fastslam_localization" name="fake_odom" type="fake_odom"/>
   <node pkg="fastslam_localization" name="fake_camera" type="fake_camera"/>
 
-
+  <node pkg="pure_pursuit" name="pure_pursuit" type="pure_pursuit" output="screen">
+    <rosparam file="$(find pure_pursuit)/params/pure_pursuit.yaml" command="load" />
+    <param name="ld" value="10"/>
+    <param name="v" value="0.5"/>
+    <param name="omega_factor" value="1.3"/>
+  </node>
 </launch>
