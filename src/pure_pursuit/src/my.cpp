@@ -37,13 +37,11 @@
 namespace pure_pursuit
 {
 
-// enum class ActionState
-// {
-//   Aim,
-//   Move,
-//   Rotate,
-//   Reached
-// };
+enum class ToggleState
+{
+  Stop,
+  Start
+};
 
 class Purepursuit
 {
@@ -53,6 +51,7 @@ public:
     nh_local_ = nh_local;
     p_active_ = false;
     params_srv_ = nh_local_.advertiseService("params", &Purepursuit::updateParams, this);
+    state_srv_ = nh_local_.advertiseService("toggle", &Purepursuit::toggleState, this);
     std_srvs::Empty empt;
     updateParams(empt.request, empt.response);
   }
@@ -123,12 +122,34 @@ private:
         pub_twist_.shutdown();
       }
     }
-
+    toggle_state_ = ToggleState::Stop;
     return true;
+  }
+
+  bool toggleState(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
+  {
+    if (toggle_state_ == ToggleState::Stop)
+    {
+      toggle_state_ = ToggleState::Start;
+      std::cout << "%% Start %%" << std::endl;
+    }
+    else if (toggle_state_ == ToggleState::Start)
+    {
+      toggle_state_ = ToggleState::Stop;
+      std::cout << "%% Stop %%" << std::endl;
+    }
   }
 
   void statusCallback(const std_msgs::Float64MultiArray::ConstPtr& ptr)
   {
+    if (toggle_state_ == ToggleState::Stop)
+    {
+      output_twist_.linear.x = 0.0;
+      output_twist_.angular.x = 0.0;
+      publishTwist();
+      return;
+    }
+
     robot_pose_.x = ptr->data[0];
     robot_pose_.y = ptr->data[1];
     robot_pose_.theta = ptr->data[2];
@@ -186,12 +207,16 @@ private:
   ros::NodeHandle nh_;
   ros::NodeHandle nh_local_;
   ros::ServiceServer params_srv_;
+  ros::ServiceServer state_srv_;
 
   ros::Subscriber sub_status_;
   ros::Publisher pub_twist_;
 
   geometry_msgs::Pose2D robot_pose_;
   geometry_msgs::Twist output_twist_;
+
+  ToggleState toggle_state_;
+
   /* ros param */
   bool p_active_;
   std::vector<geometry_msgs::Pose2D> p_path_;

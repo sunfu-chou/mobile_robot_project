@@ -42,8 +42,8 @@
 
   <node pkg="pure_pursuit" name="pure_pursuit" type="pure_pursuit" output="screen">
     <rosparam file="$(find pure_pursuit)/params/pure_pursuit.yaml" command="load" />
-    <param name="ld" value="10"/>
-    <param name="v" value="0.5"/>
-    <param name="omega_factor" value="1.3"/>
+    <param name="ld" value="9"/>
+    <param name="v" value="0.55"/>
+    <param name="omega_factor" value="1.25"/>
   </node>
 </launch>
