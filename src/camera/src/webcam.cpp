@@ -39,7 +39,7 @@ int main(int argc, char** argv)
   char ntype = 'y';
   int n_classes = 2;
   int n_batch = 1;
-  bool show = true;  // 選擇是否要開一個視窗顯示相機畫面
+  bool show = false;  // 選擇是否要開一個視窗顯示相機畫面
   float conf_thresh = 0.3;
   if (!show)
     SAVE_RESULT = true;

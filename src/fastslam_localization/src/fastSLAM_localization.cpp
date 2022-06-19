@@ -10,7 +10,7 @@
 void fast_slam_loc(double* zt, double* ut, double* St, int Nt_1, struct ConeSet* Cone_set, double* St_par, double* wt, int *localFlag, int color) {
 	//////// parameters ////////
 	// sensor model parameter
-	const double Rt_disgain = 1e-4;				// Rt[0] = q * q * Rt_disgain;
+	const double Rt_disgain = 6e-5;				// Rt[0] = q * q * Rt_disgain;
   const double Rt_degree = 1e-6;        // sqrt()=> deg
   // the parameter of the cone is the same or different (association)
   const double observer_distance = 0.3;			// unit(meter)
