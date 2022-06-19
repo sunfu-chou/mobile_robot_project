@@ -70,6 +70,7 @@ private:
     nh_local_.param<double>("v", p_v_max_, 0.46);
     nh_local_.param<double>("w", p_w_max_, 1.9);
     nh_local_.param<double>("omega_factor", p_omega_factor_, 1.1);
+    nh_local_.param<double>("tau", p_lpf_tau_, 0.45);
     ROS_INFO_STREAM("------ld------:" << p_ld_);
     p_path_.clear();
     XmlRpc::XmlRpcValue xml_path;
@@ -124,6 +125,7 @@ private:
       }
     }
     toggle_state_ = ToggleState::Stop;
+    counter_ = 0;
     return true;
   }
 
@@ -141,10 +143,19 @@ private:
     }
   }
 
+  double lpf(const double input, const double new_input)
+  {
+    double output = input;
+    output += p_lpf_tau_ * (new_input * input);
+    return output;
+  }
+
   void statusCallback(const std_msgs::Float64MultiArray::ConstPtr& ptr)
   {
+    counter_ += 1;
     if (toggle_state_ == ToggleState::Stop)
     {
+      counter_ = 0;
       output_twist_.linear.x = 0.0;
       output_twist_.angular.x = 0.0;
       publishTwist();
@@ -184,16 +195,36 @@ private:
 
     double R = util::length(goal, robot_pose_) / 2 / sin(alpha);
     ROS_INFO("R: %f", R);
-    if (p_v_max_ / R * p_omega_factor_ > p_w_max_)
+    ROS_INFO("Counter: %d", counter_);
+
+    if (robot_pose_.y > 12.8 && robot_pose_.y < 16.2)
     {
-      output_twist_.linear.x = output_twist_.angular.z / p_omega_factor_ * R;
-      output_twist_.angular.z = p_w_max_;
+      double p_v_max = 0.3;
+      if (p_v_max / R * p_omega_factor_ > p_w_max_)
+      {
+        output_twist_.angular.z = p_w_max_;
+        output_twist_.linear.x = output_twist_.angular.z / p_omega_factor_ * R;
+      }
+      else
+      {
+        output_twist_.linear.x = p_v_max;
+        output_twist_.angular.z = output_twist_.linear.x / R * p_omega_factor_;
+      }
     }
     else
     {
-      output_twist_.linear.x = p_v_max_;
-      output_twist_.angular.z = output_twist_.linear.x / R * p_omega_factor_;
+      if (p_v_max_ / R * p_omega_factor_ > p_w_max_)
+      {
+        output_twist_.angular.z = p_w_max_;
+        output_twist_.linear.x = output_twist_.angular.z / p_omega_factor_ * R;
+      }
+      else
+      {
+        output_twist_.linear.x = p_v_max_;
+        output_twist_.angular.z = output_twist_.linear.x / R * p_omega_factor_;
+      }
     }
+
     output_twist_.angular.z /= 2.0;
     publishTwist();
   }
@@ -216,6 +247,8 @@ private:
 
   ToggleState toggle_state_;
 
+  int counter_;
+
   /* ros param */
   bool p_active_;
   std::vector<geometry_msgs::Pose2D> p_path_;
@@ -224,6 +257,7 @@ private:
   double p_v_max_;
   double p_w_max_;
   double p_omega_factor_;
+  double p_lpf_tau_;
 };
 
 }  // namespace pure_pursuit

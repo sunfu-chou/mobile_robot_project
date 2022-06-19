@@ -7,9 +7,10 @@
   <node pkg="camera" type="webcam" name="webcam"/>
   <node pkg="pure_pursuit" name="pure_pursuit" type="pure_pursuit" output="screen">
     <rosparam file="$(find pure_pursuit)/params/pure_pursuit.yaml" command="load" />
-    <param name="ld" value="13"/>
-    <param name="v" value="0.32"/>
-    <param name="w" value="1.9"/>
-    <param name="omega_factor" value="1.35"/>
+    <param name="ld" value="10"/>
+    <param name="v" value="0.38"/>
+    <param name="w" value="1.8"/>
+    <param name="omega_factor" value="1.4"/>
+    <param name="tau" value="0.1"/>
   </node>
 </launch>
