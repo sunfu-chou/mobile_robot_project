@@ -1,0 +1,15 @@
+
+<launch>
+  <include file="$(find fastslam_localization)/launch/localization.launch" />
+  <include file="$(find fastslam_localization)/launch/Odometry_final.launch" />
+
+  <arg name="model" default="$(find simulation_env)/urdf/minicar_description/minicar.xacro"/>
+  <node pkg="camera" type="webcam" name="webcam"/>
+  <node pkg="pure_pursuit" name="pure_pursuit" type="pure_pursuit" output="screen">
+    <rosparam file="$(find pure_pursuit)/params/pure_pursuit.yaml" command="load" />
+    <param name="ld" value="13"/>
+    <param name="v" value="0.32"/>
+    <param name="w" value="1.9"/>
+    <param name="omega_factor" value="1.35"/>
+  </node>
+</launch>

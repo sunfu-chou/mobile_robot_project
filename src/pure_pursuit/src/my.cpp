@@ -67,7 +67,8 @@ private:
 
     nh_local_.param<bool>("active", p_active_, true);
     nh_local_.param<int>("ld", p_ld_, 10);
-    nh_local_.param<double>("v", p_v_, 0.5);
+    nh_local_.param<double>("v", p_v_max_, 0.46);
+    nh_local_.param<double>("w", p_w_max_, 1.9);
     nh_local_.param<double>("omega_factor", p_omega_factor_, 1.1);
     ROS_INFO_STREAM("------ld------:" << p_ld_);
     p_path_.clear();
@@ -183,19 +184,17 @@ private:
 
     double R = util::length(goal, robot_pose_) / 2 / sin(alpha);
     ROS_INFO("R: %f", R);
-    output_twist_.linear.x = p_v_;
-    output_twist_.angular.z = output_twist_.linear.x / R * p_omega_factor_;
-
-    // output_twist_.linear.x = p_v_ * abs(R) + p_v_;
-    // if (output_twist_.linear.x > 0)
-    //   output_twist_.linear.x = std::min(output_twist_.linear.x, 0.8);
-    // if (output_twist_.linear.x < 0)
-    //   output_twist_.linear.x = std::max(output_twist_.linear.x, -0.8);
-    // output_twist_.angular.z = output_twist_.linear.x / R * p_omega_factor_;
-    // if (output_twist_.angular.z > 0)
-    //   output_twist_.angular.z = std::min(output_twist_.angular.z, 0.8);
-    // if (output_twist_.angular.z < 0)
-    //   output_twist_.angular.z = std::max(output_twist_.angular.z, -0.8);
+    if (p_v_max_ / R * p_omega_factor_ > p_w_max_)
+    {
+      output_twist_.linear.x = output_twist_.angular.z / p_omega_factor_ * R;
+      output_twist_.angular.z = p_w_max_;
+    }
+    else
+    {
+      output_twist_.linear.x = p_v_max_;
+      output_twist_.angular.z = output_twist_.linear.x / R * p_omega_factor_;
+    }
+    output_twist_.angular.z /= 2.0;
     publishTwist();
   }
 
@@ -222,7 +221,8 @@ private:
   std::vector<geometry_msgs::Pose2D> p_path_;
   int p_path_len_;
   int p_ld_;
-  double p_v_;
+  double p_v_max_;
+  double p_w_max_;
   double p_omega_factor_;
 };
 
