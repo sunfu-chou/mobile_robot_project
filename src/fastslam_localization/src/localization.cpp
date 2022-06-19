@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
 	ROS_INFO("Initialize Finished!");
 
 	//////// Parameter Init
-	const int M = 100;							// Particle number
+	const int M = 120;							// Particle number
 //	const int landmark_number = 60;				// expext cone number
 	double del_t = 0.05;						// unit : (s)
 	double Init_Size = 0.5f;					// the init range of vehicle X Y, unit: (m)

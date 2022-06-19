@@ -176,7 +176,15 @@ private:
         min_idx = i;
       }
     }
-    int lookahead_idx = min_idx + p_ld_;
+    int lookahead_idx = 0;
+    if (robot_pose_.y > 13.8 && robot_pose_.y < 16.2)
+    {
+      lookahead_idx = min_idx + 12;
+    }
+    else
+    {
+      lookahead_idx = min_idx + p_ld_;
+    }
     if (lookahead_idx >= p_path_len_)
       lookahead_idx -= p_path_len_;
     geometry_msgs::Pose2D goal;
@@ -197,9 +205,9 @@ private:
     ROS_INFO("R: %f", R);
     ROS_INFO("Counter: %d", counter_);
 
-    if (robot_pose_.y > 12.8 && robot_pose_.y < 16.2)
+    if (robot_pose_.y > 13.8 && robot_pose_.y < 16.2)
     {
-      double p_v_max = 0.3;
+      double p_v_max = 0.32;
       if (p_v_max / R * p_omega_factor_ > p_w_max_)
       {
         output_twist_.angular.z = p_w_max_;
