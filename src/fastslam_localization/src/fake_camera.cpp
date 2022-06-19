@@ -108,8 +108,8 @@ int main(int argc, char **argv)
 		float color = 0.0f;
 		//ROS_INFO_STREAM("cx="<<cx<<" cy="<<cy);
 		if(check_if_in_sight(carpose.linear.x,carpose.linear.y,carpose.angular.z,cx,cy)){
-			sensorXP.data.push_back(distance + gaussrand()*distance); // add noise
-			sensorXP.data.push_back(direction + gaussrand()); // add noise
+			sensorXP.data.push_back(distance + gaussrand()*distance*0.9); // add noise
+			sensorXP.data.push_back(direction + gaussrand()*0.9); // add noise
 			sensorXP.data.push_back(color);
 			ROS_INFO_STREAM("cx="<<cx<<" cy="<<cy<<" color="<<color);
 			ROS_INFO_STREAM("distance="<<distance<<" direction="<<direction<<" color="<<color);
@@ -123,8 +123,8 @@ int main(int argc, char **argv)
 		float color = 1.0f;
 		//ROS_INFO_STREAM("cx="<<cx<<" cy="<<cy);
 		if(check_if_in_sight(carpose.linear.x,carpose.linear.y,carpose.angular.z,cx,cy)){
-			sensorXP.data.push_back(distance + gaussrand()*distance); // add noise
-			sensorXP.data.push_back(direction + gaussrand()); // add noise
+			sensorXP.data.push_back(distance + gaussrand()*distance*0.9); // add noise
+			sensorXP.data.push_back(direction + gaussrand()*0.9); // add noise
 			sensorXP.data.push_back(color);
 			ROS_INFO_STREAM("cx="<<cx<<" cy="<<cy<<" color="<<color);
 			ROS_INFO_STREAM("distance="<<distance<<" direction="<<direction<<" color="<<color);

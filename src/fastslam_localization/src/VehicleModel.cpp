@@ -7,9 +7,9 @@
 
 
 void VehicleModel(double v, double w, double *previous_pose, double del_t, double *X) {
-	double c1 = 0.1;
+	double c1 = 0.8;
 	double c2 = 0.1;
-	double c3 = 0.1;
+	double c3 = 0.8;
 	double c4 = 0.1;
 
 	double r[4] = {0,0,0,0};
