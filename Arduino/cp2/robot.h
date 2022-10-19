@@ -11,8 +11,8 @@ public:
   Robot()
     : enc{ { 0, 0, 0, Encoder(3, 12) }, { 0, 0, 0, Encoder(2, 4) } }
     , motors{ L298NX2(5, 8, 9, 6, 10, 11) }
-    , pid{ { 0.0, 0.0, 0.0, PID(&pid.left.feedback, &pid.left.output, &pid.left.setpoint, 55, 40, 0.05, DIRECT) },
-           { 0.0, 0.0, 0.0, PID(&pid.right.feedback, &pid.right.output, &pid.right.setpoint, 55, 40, 0.05, DIRECT) } }
+    , pid{ { 0.0, 0.0, 0.0, PID(&pid.left.feedback, &pid.left.output, &pid.left.setpoint, 120, 40, 0.05, DIRECT) },
+           { 0.0, 0.0, 0.0, PID(&pid.right.feedback, &pid.right.output, &pid.right.setpoint, 120, 40, 0.05, DIRECT) } }
   {
     pid.left.handle.SetOutputLimits(-255, 255);
     pid.right.handle.SetOutputLimits(-255, 255);
