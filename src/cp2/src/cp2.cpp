@@ -29,6 +29,7 @@ int main(int argc, char** argv){
         std::cin >> num.data[0];
         std::cout << "user's left is " ;
         std::cin >> num.data[1];
+        std::cout << "----------------------\n" ;
         // ROS_INFO_STREAM("Num sent to Arduino is: " << num.data);
 
         num_pub.publish(num);
