@@ -21,7 +21,6 @@ void setup()
   nh.advertise(num_pub);
   nh.subscribe(num_sub);
 }
-01
 
 void loop()
 {
