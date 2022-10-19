@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="cp2" node="cp2" name="cp2"/>
+  <node pkg="rosserial_server" type="serial_node" name="rosserial_server">
+    <rosparam>
+      port: /dev/ttyACM0
+    </rosparam>
+  </node>
+</launch>
