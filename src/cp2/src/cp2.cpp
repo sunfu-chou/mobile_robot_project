@@ -11,7 +11,7 @@ void num_cb(const std_msgs::Int64::ConstPtr& ptr){
 }
 
 int main(int argc, char** argv){
-  ros::init(argc, argv, "cp1");
+  ros::init(argc, argv, "cp2");
   ros::NodeHandle nh("");
   std_msgs::Float32MultiArray num;
   num.data.resize(2);
