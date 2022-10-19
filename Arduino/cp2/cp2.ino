@@ -7,7 +7,7 @@ ros::NodeHandle nh;
 Robot robot;
 
 void num_cb(const std_msgs::Float32MultiArray& msg){
-  robot.pid.set_setpoint(map(msg.data[0], -255, 255, -10, 10), map(msg.data[1], -255, 255, -10, 10));
+  robot.pid.set_setpoint(map(msg.data[1], -255, 255, -10, 10), map(msg.data[0], -255, 255, -10, 10));
 }
 
 ros::Subscriber<std_msgs::Float32MultiArray> num_sub("num/raw", &num_cb);
