@@ -4,8 +4,26 @@
 #include <std_msgs/ByteMultiArray.h>
 #include <std_msgs/String.h>
 
-ros::Publisher num_pub;
+ros::Publisher action_pub;
 bool arduino_return_state = true;
+
+class FSM {
+private:
+  enum Action {forward, right, left, backward};
+  
+public:
+  FSM();
+  ~FSM();
+  std_msgs::String  process_event();
+};
+
+FSM::FSM()
+{
+  Action action;
+  action = forward;
+}
+
+
 
 void state_cb(const std_msgs::Int64::ConstPtr& ptr){
   ROS_INFO_STREAM("Num received from Arduino is: " << ptr->data);
@@ -23,24 +41,45 @@ int main(int argc, char** argv){
   try
   {
     ROS_INFO("[Check Point 3]: Initializing node");
-
+    Action state;
+    state = foward;
     while(ros::ok){
       if (arduino_return_state || true){
-        // ROS_INFO_STREAM("user's right is");
-        std::cout << "user's right is " ;
-        std::cin >> num.data[0];
-        std::cout << "user's left is " ;
-        std::cin >> num.data[1];
-        std::cout << "----------------------\n" ;
-        // ROS_INFO_STREAM("Num sent to Arduino is: " << num.data);
+        // test
+        if(right == 1 || left == 1){
+          if(right == 1 && left == 1){
+            action_pub.publish('b');
+            ros.sleep();
+          }
+          if(right == 1 && left ==0){
+            action_pub.publish('l');
+            ros.sleep();
+          }
+          if(right == 0 && left ==1){
+            action_pub.publish('r');
+            ros.sleep();
+          }
+        }
+        else{
+          if(mid == 1){
+            //s = stop
+            action_pub.publish('s');
+          }
+          if (mid == 0){
+            // ....
+          }
 
-        num_pub.publish(action);
+        }
+
+        action_pub.publish(action);
         arduino_return_state = false;
       }
       ros::spinOnce();
     }
       
   }
+
+
   catch (const char* s)
   {
     ROS_FATAL_STREAM("[Check Point 3]: " << s);
