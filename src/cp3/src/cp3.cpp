@@ -61,17 +61,21 @@ int main(int argc, char** argv){
       if(state == forward){
         if(right == 1 || left == 1){
 
-          ros::Time begin = ros::Time::now();
+          double begin = ros::Time::now().toSec();
 
           if(right == 1 && left == 1){
-            ros::Time now = ros::Time::now();
+            double now = ros::Time::now().toSec();
             while((now - begin) < 1.0 ){
+              now = ros::Time::now().toSec();
               action_pub.publish('b');
             }
-            
-            ros::Duration(0.5).sleep();
-            action_pub.publish('r');
-            ros::Duration(0.5).sleep();
+
+            begin = ros::Time::now().toSec();
+            while((now - begin) < 1.0 ){
+              now = ros::Time::now().toSec();
+              action_pub.publish('r');
+            }
+
             state = scan;
           }
           if(right == 1 && left ==0){
