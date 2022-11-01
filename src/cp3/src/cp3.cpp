@@ -45,8 +45,8 @@ int main(int argc, char** argv){
   // action.data.resize(2);
   action_pub = nh.advertise<std_msgs::String>("action", 10);
   ros::Subscriber state_sub = nh.subscribe("state", 10, &state_cb);
-
-  enum Action {forward, scan, done };
+  double last_time = 0.8;
+  enum Action {forward, scanRight, scanLeft, done };
   Action state;    
   state = forward;
 
@@ -56,8 +56,6 @@ int main(int argc, char** argv){
     while(ros::ok){
         // test
 
-
-
       if(state == forward){
         if(right == 1 || left == 1){
 
@@ -65,34 +63,54 @@ int main(int argc, char** argv){
 
           if(right == 1 && left == 1){
             double now = ros::Time::now().toSec();
-            while((now - begin) < 1.0 ){
+            while((now - begin) < last_time ){
               now = ros::Time::now().toSec();
               action_pub.publish('b');
+              ros::spinOnce();
             }
 
             begin = ros::Time::now().toSec();
-            while((now - begin) < 1.0 ){
+            while((now - begin) < last_time ){
               now = ros::Time::now().toSec();
               action_pub.publish('r');
+              ros::spinOnce();
             }
 
             state = scan;
           }
           if(right == 1 && left ==0){
-            action_pub.publish('l');
-            ros::Duration(0.5).sleep();
-            action_pub.publish('f');
-            ros::Duration(0.5).sleep();
-            action_pub.publish('s');
-            state = scan;
+            double now = ros::Time::now().toSec();
+            while((now - begin) < last_time ){
+              now = ros::Time::now().toSec();
+              action_pub.publish('l');
+              ros::spinOnce();
+            }
+
+            begin = ros::Time::now().toSec();
+            while((now - begin) < last_time ){
+              now = ros::Time::now().toSec();
+              action_pub.publish('f');
+              ros::spinOnce();
+            }
+
+            state = scanLeft;
           }
           if(right == 0 && left ==1){
-            action_pub.publish('r');
-            ros::Duration(0.5).sleep();
-            action_pub.publish('f');
-            ros::Duration(0.5).sleep();
-            action_pub.publish('s');
-            state = scan;
+            double now = ros::Time::now().toSec();
+            while((now - begin) < last_time ){
+              now = ros::Time::now().toSec();
+              action_pub.publish('r');
+              ros::spinOnce();
+            }
+
+            begin = ros::Time::now().toSec();
+            while((now - begin) < last_time ){
+              now = ros::Time::now().toSec();
+              action_pub.publish('f');
+              ros::spinOnce();
+            }
+            
+            state = scanRight;
           }
         }
         else{
@@ -103,16 +121,39 @@ int main(int argc, char** argv){
           }
         }
 
-      if(state == scan){
-        while(photo != 1){
-          action_pub.publish('');
+      if(state == scanRight){
+        int count = 0;
+        double begin = ros::Time::now().toSec();
+        while(photo != 1 or count < 3){
+          double now = ros::Time::now().toSec();
+          while((now - begin) < last_time ){
+              now = ros::Time::now().toSec();
+              action_pub.publish('r');
+              ros::spinOnce();
+            }
+          count += 1;
+          ros::spinOnce();
         }
-
-
-      
+        state = forward;
       }
 
+      if(state == scanLeft){
+        int count = 0;
+        double begin = ros::Time::now().toSec();
+        while(photo != 1 or count < 3){
 
+          double now = ros::Time::now().toSec();
+          while((now - begin) < last_time ){
+              now = ros::Time::now().toSec();
+              action_pub.publish('r');
+              ros::spinOnce();
+            }
+          count += 1;
+
+          ros::spinOnce();
+        }
+        state = forward;
+      }
         
         // arduino_return_state = false;
       }
