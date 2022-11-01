@@ -5,29 +5,37 @@
 #include <std_msgs/String.h>
 
 ros::Publisher action_pub;
-bool arduino_return_state = true;
+// bool arduino_return_state = true;
 
-class FSM {
-private:
-  enum Action {forward, right, left, backward};
+// class FSM {
+// private:
+//   enum Action {forward, right, left, backward};
   
-public:
-  FSM();
-  ~FSM();
-  std_msgs::String  process_event();
-};
+// public:
+//   FSM();
+//   ~FSM();
+//   std_msgs::String  process_event();
+// };
 
-FSM::FSM()
-{
-  Action action;
-  action = forward;
-}
+// FSM::FSM()
+// {
+//   Action action;
+//   action = forward;
+// }
 
+// global statics
+int photo = 0;
+int left = 0;
+int mid = 0;
+int right = 0;
 
-
-void state_cb(const std_msgs::Int64::ConstPtr& ptr){
-  ROS_INFO_STREAM("Num received from Arduino is: " << ptr->data);
-  arduino_return_state = true;
+void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr){
+  // ROS_INFO_STREAM("Num received from Arduino is: " << ptr->data);
+  photo = ptr->data[0];
+  left = ptr->data[1];
+  mid = ptr->data[2];
+  right = ptr->data[3];
+  // arduino_return_state = true;
 }
 
 int main(int argc, char** argv){
@@ -38,44 +46,73 @@ int main(int argc, char** argv){
   action_pub = nh.advertise<std_msgs::String>("action", 10);
   ros::Subscriber state_sub = nh.subscribe("state", 10, &state_cb);
 
+  enum Action {forward, scan, done };
+  Action state;    
+  state = forward;
+
   try
   {
     ROS_INFO("[Check Point 3]: Initializing node");
-    Action state;
-    state = foward;
     while(ros::ok){
-      if (arduino_return_state || true){
         // test
+
+
+
+      if(state == forward){
         if(right == 1 || left == 1){
+
+          ros::Time begin = ros::Time::now();
+
           if(right == 1 && left == 1){
-            action_pub.publish('b');
-            ros.sleep();
+            ros::Time now = ros::Time::now();
+            while((now - begin) < 1.0 ){
+              action_pub.publish('b');
+            }
+            
+            ros::Duration(0.5).sleep();
+            action_pub.publish('r');
+            ros::Duration(0.5).sleep();
+            state = scan;
           }
           if(right == 1 && left ==0){
             action_pub.publish('l');
-            ros.sleep();
+            ros::Duration(0.5).sleep();
+            action_pub.publish('f');
+            ros::Duration(0.5).sleep();
+            action_pub.publish('s');
+            state = scan;
           }
           if(right == 0 && left ==1){
             action_pub.publish('r');
-            ros.sleep();
+            ros::Duration(0.5).sleep();
+            action_pub.publish('f');
+            ros::Duration(0.5).sleep();
+            action_pub.publish('s');
+            state = scan;
           }
         }
         else{
           if(mid == 1){
             //s = stop
             action_pub.publish('s');
+            state = done;
           }
-          if (mid == 0){
-            // ....
-          }
-
         }
 
-        action_pub.publish(action);
-        arduino_return_state = false;
+      if(state == scan){
+        while(photo != 1){
+          action_pub.publish('');
+        }
+
+
+      
+      }
+
+
+        
+        // arduino_return_state = false;
       }
       ros::spinOnce();
-    }
       
   }
 
