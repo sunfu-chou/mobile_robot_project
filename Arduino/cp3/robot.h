@@ -1,6 +1,7 @@
 #ifndef __ROBOT_H__
 #define __ROBOT_H__
 
+#include <Arduino.h>
 #include <Encoder.h>
 #include <L298NX2.h>
 #include <PID_v1.h>
@@ -13,6 +14,8 @@ public:
     , motors{ L298NX2(5, 8, 9, 6, 10, 11) }
     , pid{ { 0.0, 0.0, 0.0, PID(&pid.left.feedback, &pid.left.output, &pid.left.setpoint, 300, 870, 0.00, DIRECT) },
            { 0.0, 0.0, 0.0, PID(&pid.right.feedback, &pid.right.output, &pid.right.setpoint, 300, 870, 0.00, DIRECT) } }
+    , ms{ { 7, 0 }, { 13, 0 }, { A1, 0 } }
+    , pr{ A2, A3, 0, 0 }
   {
     pid.left.handle.SetOutputLimits(-255, 255);
     pid.right.handle.SetOutputLimits(-255, 255);
@@ -88,6 +91,7 @@ public:
     }
   } motors;
 
+  // PID
   struct
   {
     struct
@@ -117,8 +121,67 @@ public:
     }
   } pid;
 
+  // MS
+  struct
+  {
+    struct
+    {
+      int pin;
+      int data;
+
+      void init()
+      {
+        pinMode(pin, INPUT);
+      }
+      void read()
+      {
+        data = digitalRead(pin);
+      }
+    } left, right, mid;
+
+    void init()
+    {
+      left.init();
+      right.init();
+      mid.init();
+    }
+
+    void read()
+    {
+      left.read();
+      right.read();
+      mid.read();
+    }
+  } ms;
+
+  // pr
+
+  struct
+  {
+    int pin_a;
+    int pin_d;
+    int volt;
+    int on;
+
+    void reada()
+    {
+      volt = analogRead(pin_a);
+    }
+    void readd()
+    {
+      on = digitalRead(pin_d);
+    }
+  } pr;
+
+  void init(){
+    ms.init();
+  }
+
   void run()
   {
+    ms.read();
+    pr.reada();
+    pr.readd();
     enc.read();
     pid.set_feedback(enc.left.diff, enc.right.diff);
     pid.compute();

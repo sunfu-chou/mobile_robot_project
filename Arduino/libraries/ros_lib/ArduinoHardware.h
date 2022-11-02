@@ -78,7 +78,7 @@ class ArduinoHardware {
 #else
       iostream = &Serial;
 #endif
-      baud_ = 57600;
+      baud_ = 115200;
     }
     ArduinoHardware(ArduinoHardware& h){
       this->iostream = h.iostream;
