@@ -17,8 +17,8 @@ int left = 0;
 int mid = 0;
 int right = 0;
 
-double begin = ros::Time::now().toSec();
-double now = ros::Time::now().toSec();
+double begin = 0;
+double now = 0;
 double last_time = 0.8;
 std_msgs::Int64 action;
 
@@ -46,7 +46,8 @@ void do_action(int a){
 int main(int argc, char** argv){
   ros::init(argc, argv, "cp3");
   ros::NodeHandle nh("");
-  
+  begin = ros::Time::now().toSec();
+  now = ros::Time::now().toSec();
   // action : 0 stop, 1 forward, 2 right, 3 left, 4 backward 
   action_pub = nh.advertise<std_msgs::Int64>("action", 10);
   ros::Subscriber state_sub = nh.subscribe("state", 10, &state_cb);
