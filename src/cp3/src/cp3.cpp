@@ -36,13 +36,14 @@ void do_action(int a)
 {
   begin = ros::Time::now().toSec();
   now = ros::Time::now().toSec();
-  while ((now - begin) < last_time)
-  {
-    now = ros::Time::now().toSec();
-    action.data = a;
-    action_pub.publish(action);
-    ros::spinOnce();
-  }
+  action.data = a;
+  action_pub.publish(action);
+  // while ((now - begin) < last_time)
+  // {
+  //   now = ros::Time::now().toSec();
+  //   ros::spinOnce();
+  // }
+  ros::Duration(0.5).sleep();
 }
 
 int main(int argc, char** argv)
@@ -52,8 +53,8 @@ int main(int argc, char** argv)
   begin = ros::Time::now().toSec();
   now = ros::Time::now().toSec();
   // action : 0 stop, 1 forward, 2 right, 3 left, 4 backward
-  action_pub = nh.advertise<std_msgs::Int64>("action", 10);
-  ros::Subscriber state_sub = nh.subscribe("state", 10, &state_cb);
+  action_pub = nh.advertise<std_msgs::Int64>("action", 1);
+  ros::Subscriber state_sub = nh.subscribe("state", 1, &state_cb);
 
   enum Action
   {
@@ -101,13 +102,11 @@ int main(int argc, char** argv)
           if (mid == 1)
           {
             // s = stop
-            action.data = st;
-            action_pub.publish(action);
+            do_action(st);
             state = done;
           }
           else{
-            action.data = fw;
-            action_pub.publish(action);
+            do_action(fw);
           }
         }
       }
