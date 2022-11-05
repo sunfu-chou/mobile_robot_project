@@ -14,7 +14,7 @@ void action_cb(const std_msgs::Int64& msg);
 void publish();
 
 std_msgs::ByteMultiArray state;
-int8_t state_arr[5];
+int8_t state_arr[10];
 ros::Publisher state_pub("state", &state);
 
 ros::Subscriber<std_msgs::Int64> action_sub("action", &action_cb);
@@ -28,7 +28,7 @@ void setup()
   leftsp = 0;
   rightsp = 0;
   state.data = state_arr;
-  state.data_length = 4;
+  state.data_length = 10;
   robot.init();
   robot.pid.set_setpoint(20, 20);
   nh.initNode();
@@ -92,5 +92,6 @@ void publish()
   state.data[1] = robot.ms.left.data;
   state.data[2] = robot.ms.mid.data;
   state.data[3] = robot.ms.right.data;
+  state.data[4] += 1;
   state_pub.publish(&state);
 }
