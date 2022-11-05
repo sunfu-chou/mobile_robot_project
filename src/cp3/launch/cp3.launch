@@ -1,8 +1,7 @@
 <launch>
   <node pkg="cp3" type="cp3" name="cp3"/>
   <node pkg="rosserial_server" type="serial_node" name="rosserial_server">
-    <rosparam>
-      port: /dev/ttyACM0
-    </rosparam>
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="115200"/>
   </node>
 </launch>
