@@ -40,7 +40,7 @@ void do_action(int a)
   now = ros::Time::now().toSec();
   action.data = a;
 
-  last_time = (a == ls || a == rs) ? 0.1 : 0.8;
+  last_time = (a == ls || a == rs || a == fw) ? 0.1 : 0.8;
 
   action_pub.publish(action);
   // while ((now - begin) < last_time)
