@@ -68,7 +68,7 @@ int main(int argc, char** argv)
   try
   {
     ROS_INFO("[Check Point 3]: Initializing node");
-    while (ros::ok)
+    while (ros::ok())
     {
       if (state == forward)
       {
