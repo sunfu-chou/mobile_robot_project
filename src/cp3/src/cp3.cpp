@@ -37,13 +37,16 @@ void do_action(int a)
   begin = ros::Time::now().toSec();
   now = ros::Time::now().toSec();
   action.data = a;
+
+  last_time = (a == ls || s == rs) ? 0.5 : 0.8;
+
   action_pub.publish(action);
   // while ((now - begin) < last_time)
   // {
   //   now = ros::Time::now().toSec();
   //   ros::spinOnce();
   // }
-  ros::Duration(0.5).sleep();
+  ros::Duration(last_time).sleep();
 }
 
 int main(int argc, char** argv)
