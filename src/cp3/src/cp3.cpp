@@ -19,7 +19,7 @@ int right = 0;
 
 double begin = 0;
 double now = 0;
-double last_time = 0.8;
+double last_time = 0.5;
 std_msgs::Int64 action;
 
 void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr)
@@ -107,11 +107,10 @@ int main(int argc, char** argv)
           }
         }
       }
-      if (state == scanRight)
-      {
+    if (state == scanRight){
         int count = 0;
 
-        while (photo != 1 or count < 3)
+        while (photo != 1 && count < 3)
         {
           do_action(rs);
           count += 1;
@@ -119,11 +118,10 @@ int main(int argc, char** argv)
         }
         state = forward;
       }
-      if (state == scanLeft)
-      {
+    if (state == scanLeft){
         int count = 0;
 
-        while (photo != 1 or count < 3)
+        while (photo != 1 && count < 3)
         {
           do_action(ls);
           count += 1;
