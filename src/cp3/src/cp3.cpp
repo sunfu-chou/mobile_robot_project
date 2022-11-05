@@ -17,6 +17,8 @@ int left = 0;
 int mid = 0;
 int right = 0;
 
+int rotate_times = 10;
+
 double begin = 0;
 double now = 0;
 double last_time = 0.5;
@@ -38,7 +40,7 @@ void do_action(int a)
   now = ros::Time::now().toSec();
   action.data = a;
 
-  last_time = (a == ls || a == rs) ? 0.5 : 0.8;
+  last_time = (a == ls || a == rs) ? 0.1 : 0.8;
 
   action_pub.publish(action);
   // while ((now - begin) < last_time)
@@ -120,7 +122,7 @@ int main(int argc, char** argv)
       {
         int count = 0;
 
-        while (photo != 1 && count < 3)
+        while (photo != 1 && count < rotate_times)
         {
           do_action(rs);
           count += 1;
@@ -132,7 +134,7 @@ int main(int argc, char** argv)
       {
         int count = 0;
 
-        while (photo != 1 && count < 3)
+        while (photo != 1 && count < rotate_times)
         {
           do_action(ls);
           count += 1;
