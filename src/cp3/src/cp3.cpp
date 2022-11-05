@@ -105,6 +105,10 @@ int main(int argc, char** argv)
             action_pub.publish(action);
             state = done;
           }
+          else{
+            action.data = fw;
+            action_pub.publish(action);
+          }
         }
       }
     if (state == scanRight){
