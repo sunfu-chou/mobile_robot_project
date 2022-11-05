@@ -54,7 +54,7 @@ int main(int argc, char** argv)
   now = ros::Time::now().toSec();
   // action : 0 stop, 1 forward, 2 right, 3 left, 4 backward
   action_pub = nh.advertise<std_msgs::Int64>("action", 1);
-  ros::Subscriber state_sub = nh.subscribe("state", 1, &state_cb);
+  ros::Subscriber state_sub = nh.subscribe("state", 10, &state_cb);
 
   enum Action
   {
@@ -84,6 +84,7 @@ int main(int argc, char** argv)
           }
           if (right == 1 && left == 0)
           {
+            do_action(bw);
             do_action(ls);
             do_action(fw);
 
@@ -91,6 +92,7 @@ int main(int argc, char** argv)
           }
           if (right == 0 && left == 1)
           {
+            do_action(bw);
             do_action(rs);
             do_action(fw);
 
@@ -105,12 +107,14 @@ int main(int argc, char** argv)
             do_action(st);
             state = done;
           }
-          else{
+          else
+          {
             do_action(fw);
           }
         }
       }
-    if (state == scanRight){
+      if (state == scanRight)
+      {
         int count = 0;
 
         while (photo != 1 && count < 3)
@@ -121,7 +125,8 @@ int main(int argc, char** argv)
         }
         state = forward;
       }
-    if (state == scanLeft){
+      if (state == scanLeft)
+      {
         int count = 0;
 
         while (photo != 1 && count < 3)
