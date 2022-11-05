@@ -3,20 +3,21 @@
 #include <ros.h>
 #include <std_msgs/ByteMultiArray.h>
 #include <std_msgs/Byte.h>
+#include <std_msgs/Int64.h>
 
 #include "robot.h"
 
 ros::NodeHandle nh;
 Robot robot;
 
-void action_cb(const std_msgs::Byte& msg);
+void action_cb(const std_msgs::Int64& msg);
 void publish();
 
 std_msgs::ByteMultiArray state;
 int8_t state_arr[5];
 ros::Publisher state_pub("state", &state);
 
-ros::Subscriber<std_msgs::Byte> action_sub("action", &action_cb);
+ros::Subscriber<std_msgs::Int64> action_sub("action", &action_cb);
 
 unsigned long previousMillis = 0;
 
@@ -51,7 +52,7 @@ void loop()
   delay(1);
 }
 
-void action_cb(const std_msgs::Byte& msg)
+void action_cb(const std_msgs::Int64& msg)
 {
   if (msg.data == 1)
   {
