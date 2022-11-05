@@ -17,7 +17,7 @@ int left = 0;
 int mid = 0;
 int right = 0;
 
-int rotate_times = 10;
+int rotate_times = 15;
 
 double begin = 0;
 double now = 0;
@@ -90,16 +90,16 @@ int main(int argc, char** argv)
           if (right == 1 && left == 0)
           {
             do_action(bw);
-            do_action(ls);
-            do_action(fw);
+            // do_action(ls);
+            // do_action(fw);
 
             state = scanLeft;
           }
           if (right == 0 && left == 1)
           {
             do_action(bw);
-            do_action(rs);
-            do_action(fw);
+            // do_action(rs);
+            // do_action(fw);
 
             state = scanRight;
           }
