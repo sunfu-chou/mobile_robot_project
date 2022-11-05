@@ -22,20 +22,22 @@ double now = 0;
 double last_time = 0.8;
 std_msgs::Int64 action;
 
-
-void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr){
+void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr)
+{
   // ROS_INFO_STREAM("Num received from Arduino is: " << ptr->data);
-  photo = ptr->data[0];
-  left = ptr->data[1];
-  mid = ptr->data[2];
-  right = ptr->data[3];
+  photo = 1 - ptr->data[0];
+  left = 1 - ptr->data[1];
+  mid = 1 - ptr->data[2];
+  right = 1 - ptr->data[3];
   // arduino_return_state = true;
 }
 
-void do_action(int a){
+void do_action(int a)
+{
   begin = ros::Time::now().toSec();
   now = ros::Time::now().toSec();
-  while((now - begin) < last_time ){
+  while ((now - begin) < last_time)
+  {
     now = ros::Time::now().toSec();
     action.data = a;
     action_pub.publish(action);
@@ -43,77 +45,95 @@ void do_action(int a){
   }
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv)
+{
   ros::init(argc, argv, "cp3");
   ros::NodeHandle nh("");
   begin = ros::Time::now().toSec();
   now = ros::Time::now().toSec();
-  // action : 0 stop, 1 forward, 2 right, 3 left, 4 backward 
+  // action : 0 stop, 1 forward, 2 right, 3 left, 4 backward
   action_pub = nh.advertise<std_msgs::Int64>("action", 10);
   ros::Subscriber state_sub = nh.subscribe("state", 10, &state_cb);
-  
-  enum Action {forward, scanRight, scanLeft, done };
-  Action state;    
+
+  enum Action
+  {
+    forward,
+    scanRight,
+    scanLeft,
+    done
+  };
+  Action state;
   state = forward;
 
   try
   {
     ROS_INFO("[Check Point 3]: Initializing node");
-    while(ros::ok){
-      if(state == forward){
-        if(right == 1 || left == 1){
-          if(right == 1 && left == 1){
+    while (ros::ok)
+    {
+      if (state == forward)
+      {
+        if (right == 1 || left == 1)
+        {
+          if (right == 1 && left == 1)
+          {
             do_action(bw);
             do_action(rs);
 
             state = scanRight;
           }
-          if(right == 1 && left ==0){
+          if (right == 1 && left == 0)
+          {
             do_action(ls);
             do_action(fw);
 
             state = scanLeft;
           }
-          if(right == 0 && left ==1){
+          if (right == 0 && left == 1)
+          {
             do_action(rs);
             do_action(fw);
-            
+
             state = scanRight;
           }
         }
-        else{
-          if(mid == 1){
-            //s = stop
+        else
+        {
+          if (mid == 1)
+          {
+            // s = stop
             action.data = st;
             action_pub.publish(action);
             state = done;
           }
         }
       }
-      if(state == scanRight){
+      if (state == scanRight)
+      {
         int count = 0;
-        
-        while(photo != 1 or count < 3){
+
+        while (photo != 1 or count < 3)
+        {
           do_action(rs);
           count += 1;
           ros::spinOnce();
         }
         state = forward;
       }
-      if(state == scanLeft){
+      if (state == scanLeft)
+      {
         int count = 0;
-        
-        while(photo != 1 or count < 3){
+
+        while (photo != 1 or count < 3)
+        {
           do_action(ls);
           count += 1;
           ros::spinOnce();
         }
         state = forward;
       }
-        // arduino_return_state = false;
-      
+      // arduino_return_state = false;
+
       ros::spinOnce();
-      
     }
   }
 
