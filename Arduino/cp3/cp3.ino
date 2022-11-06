@@ -43,7 +43,7 @@ void loop()
   robot.run();
 
   unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= 100l)
+  if (currentMillis - previousMillis >= 50l)
   {
     previousMillis = currentMillis;
 
@@ -92,6 +92,8 @@ void publish()
   state.data[1] = robot.ms.left.data;
   state.data[2] = robot.ms.mid.data;
   state.data[3] = robot.ms.right.data;
-  state.data[4] += 1;
+  state.data[4] = map(robot.pr.volt, 0, 1023, -128, 127);
+  state.data[5] += 1;
+  state.data[6] = -1;
   state_pub.publish(&state);
 }
