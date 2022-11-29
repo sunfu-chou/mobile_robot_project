@@ -116,7 +116,7 @@ int main(int argc, char** argv)
             // s = stop
             do_action(st);
             state = gotBall;
-            do_action(fw)
+            do_action(fw);
           }
           else
           {
@@ -149,8 +149,56 @@ int main(int argc, char** argv)
         state = forward;
       }
       if (state == gotBall){
-        if(mid != 0) state = forward;
+        if (right == 1 || left == 1)
+        {
+          if (right == 1 && left == 1)
+          {
+            do_action(bw);
+            do_action(rs);
+            state = scanRightBeacon;
+          }
+          if (right == 1 && left == 0)
+          {
+            do_action(bw);
+            state = scanLeftBeacon;
+          }
+          if (right == 0 && left == 1)
+          {
+            do_action(bw);
+            state = scanRightBeacon;
+          }
+        }
+        else
+        {
+          if(mid != 0) 
+            state = forward;
+          else
+            do_action(fw);
+        }
+      }
+      if (state == scanRightBeacon)
+      {
+        int count = 0;
 
+        while (beacon != 1 && count < rotate_times)
+        {
+          do_action(rs);
+          count += 1;
+          ros::spinOnce();
+        }
+        state = gotBall;
+      }
+      if (state == scanLeftBeacon)
+      {
+        int count = 0;
+
+        while (beacon != 1 && count < rotate_times)
+        {
+          do_action(ls);
+          count += 1;
+          ros::spinOnce();
+        }
+        state = gotBall;
       }
       // arduino_return_state = false;
 
