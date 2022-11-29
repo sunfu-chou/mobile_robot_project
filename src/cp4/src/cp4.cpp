@@ -58,7 +58,7 @@ void do_action(int a)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "cp3");
+  ros::init(argc, argv, "cp4");
   ros::NodeHandle nh("");
   ros::NodeHandle nh_local("~");
 
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
   try
   {
-    ROS_INFO("[Check Point 3]: Initializing node");
+    ROS_INFO("[Check Point 4]: Initializing node");
     while (ros::ok())
     {
       if (state == forward)
@@ -208,11 +208,11 @@ int main(int argc, char** argv)
 
   catch (const char* s)
   {
-    ROS_FATAL_STREAM("[Check Point 3]: " << s);
+    ROS_FATAL_STREAM("[Check Point 4]: " << s);
   }
   catch (...)
   {
-    ROS_FATAL_STREAM("[Check Point 3]: Unexpected error");
+    ROS_FATAL_STREAM("[Check Point 4]: Unexpected error");
   }
 
   return 0;
