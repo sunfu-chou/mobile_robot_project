@@ -12,12 +12,14 @@
 
 ros::Publisher action_pub;
 
+// ros param
+int ind_beacon = 0;
+
 int photo = 0;
 int left = 0;
 int mid = 0;
 int right = 0;
-int beacon600 = 0;
-int beacon1500 = 0;
+int beacon = 0;
 
 int rotate_times = 15;
 
@@ -33,8 +35,7 @@ void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr)
   left = 1 - ptr->data[1];
   mid = 1 - ptr->data[2];
   right = 1 - ptr->data[3];
-  beacon600 = ptr->data[4];
-  beacon1500 = ptr->data[5];
+  beacon = ptr->data[ind_beacon];
   // arduino_return_state = true;
 }
 
@@ -59,6 +60,10 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "cp3");
   ros::NodeHandle nh("");
+  ros::NodeHandle nh_local("~");
+
+  nh_local.param<int>("beacon", ind_beacon, 5);
+  
   begin = ros::Time::now().toSec();
   now = ros::Time::now().toSec();
   // action : 0 stop, 1 forward, 2 right, 3 left, 4 backward

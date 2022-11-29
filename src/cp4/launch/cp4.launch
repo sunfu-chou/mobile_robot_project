@@ -1,5 +1,11 @@
 <launch>
-  <node pkg="cp4" type="cp4" name="cp4"/>
+  <arg name="beacon" default="5"/>
+  <node pkg="cp4" type="cp4" name="cp4">
+    <!-- 5 for 600 -->
+    <!-- 6 for 1500 -->
+    <param name="beacon" value="$(arg beacon)"/>
+  </node>
+
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
     <param name="port" value="/dev/ttyACM0"/>
     <param name="baud" value="115200"/>
