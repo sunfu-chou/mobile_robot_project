@@ -70,20 +70,20 @@ void action_cb(const std_msgs::Int64& msg)
   }
   else if (msg.data == 4)
   {
-    leftsp = -4;
-    rightsp = -4;
+    leftsp = -3;
+    rightsp = -3;
     return;
   }
   else if (msg.data == 3)
   {
-    leftsp = -3;
-    rightsp = 3;
+    leftsp = -2;
+    rightsp = 2;
     return;
   }
   else if (msg.data == 2)
   {
-    leftsp = 3;
-    rightsp = -3;
+    leftsp = 2;
+    rightsp = -2;
     return;
   }
   else if (msg.data == 0)

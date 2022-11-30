@@ -21,7 +21,7 @@ int mid = 0;
 int right = 0;
 int beacon = 0;
 
-int rotate_times = 15;
+int rotate_times = 21;
 
 double begin = 0;
 double now = 0;
@@ -159,12 +159,12 @@ int main(int argc, char** argv)
           }
           if (right == 1 && left == 0)
           {
-            do_action(bw);
+            // do_action(bw);
             state = scanLeftBeacon;
           }
           if (right == 0 && left == 1)
           {
-            do_action(bw);
+            // do_action(bw);
             state = scanRightBeacon;
           }
         }
@@ -173,7 +173,7 @@ int main(int argc, char** argv)
           if(mid != 1) 
             state = forward;
           else
-            do_action(fw);
+            state = scanLeftBeacon;
         }
       }
       if (state == scanRightBeacon)
