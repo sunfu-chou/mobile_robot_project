@@ -35,6 +35,8 @@ void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr)
   left = 1 - ptr->data[1];
   mid = 1 - ptr->data[2];
   right = 1 - ptr->data[3];
+  // 5 for 600
+  // 6 for 1500
   beacon = ptr->data[ind_beacon];
   // arduino_return_state = true;
 }
@@ -63,13 +65,23 @@ int main(int argc, char** argv)
   ros::NodeHandle nh_local("~");
 
   nh_local.param<int>("beacon", ind_beacon, 5);
-  
+
   begin = ros::Time::now().toSec();
   now = ros::Time::now().toSec();
   // action : 0 stop, 1 forward, 2 right, 3 left, 4 backward
   action_pub = nh.advertise<std_msgs::Int64>("action", 1);
   ros::Subscriber state_sub = nh.subscribe("state", 10, &state_cb);
 
+  // 5 for 600
+  // 6 for 1500
+  if (ind_beacon == 5)
+  {
+    ROS_INFO_STREAM("600");
+  }
+  else if (ind_beacon == 6)
+  {
+    ROS_INFO_STREAM("1500");
+  }
   enum Action
   {
     forward,
@@ -148,7 +160,8 @@ int main(int argc, char** argv)
         }
         state = forward;
       }
-      if (state == gotBall){
+      if (state == gotBall)
+      {
         if (right == 1 || left == 1)
         {
           if (right == 1 && left == 1)
@@ -170,7 +183,7 @@ int main(int argc, char** argv)
         }
         else
         {
-          if(mid != 1) 
+          if (mid != 1)
             state = forward;
           else
             state = scanLeftBeacon;

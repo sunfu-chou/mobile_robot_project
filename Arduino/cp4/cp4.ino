@@ -102,6 +102,8 @@ void publish()
   state.data[2] = robot.ms.mid.data;
   state.data[3] = robot.ms.right.data;
   state.data[4] = map(robot.pr.volt, 0, 1023, -128, 127);
+  // 5 for 600
+  // 6 for 1500
   if (robot.duty_cycle_ir > 0.5 && robot.duty_cycle_ir < 0.7)
   {
     state.data[5] = 1;
