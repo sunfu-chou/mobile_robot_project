@@ -6,7 +6,7 @@
     <param name="beacon" value="$(arg beacon)"/>
   </node>
 
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
     <param name="port" value="/dev/ttyACM0"/>
     <param name="baud" value="115200"/>
   </node>

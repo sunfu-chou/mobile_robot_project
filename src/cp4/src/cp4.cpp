@@ -114,7 +114,7 @@ int main(int argc, char** argv)
           if (mid == 1)
           {
             // s = stop
-            do_action(st);
+            // do_action(st);
             state = gotBall;
             do_action(fw);
           }
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
         }
         else
         {
-          if(mid != 0) 
+          if(mid != 1) 
             state = forward;
           else
             do_action(fw);
