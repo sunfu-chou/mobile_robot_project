@@ -15,13 +15,14 @@ void publish();
 
 std_msgs::ByteMultiArray state;
 
-#define STATE_ARR_LEN 11
+#define STATE_ARR_LEN 20
 int8_t state_arr[STATE_ARR_LEN];
 ros::Publisher state_pub("state", &state);
 
 ros::Subscriber<std_msgs::Int64> action_sub("action", &action_cb);
 
-unsigned long previousMillis = 0;
+unsigned long MillisTasks10 = 0;
+unsigned long MillisTasks1 = 0;
 
 double leftsp, rightsp;
 
@@ -32,7 +33,7 @@ void setup()
   state.data = state_arr;
   state.data_length = STATE_ARR_LEN;
   robot.init();
-  robot.pid.set_setpoint(20, 20);
+  robot.pid.set_setpoint(0, 0);
   nh.initNode();
   nh.advertise(state_pub);
   nh.subscribe(action_sub);
@@ -40,18 +41,23 @@ void setup()
 
 void loop()
 {
-  nh.spinOnce();
-  robot.pid.set_setpoint(-rightsp, -leftsp);
-  robot.run();
-
   unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= 50l)
-  {
-    previousMillis = currentMillis;
+  nh.spinOnce();
 
+  robot.pid.set_setpoint(-rightsp, -leftsp);
+  robot.readIR();
+
+  if (currentMillis - MillisTasks1 >= 1l)
+  {
+    MillisTasks1 = currentMillis;
+    robot.run();
+  }
+
+  if (currentMillis - MillisTasks10 >= 100l)
+  {
+    MillisTasks10 = currentMillis;
     publish();
   }
-  delay(1);
 }
 
 void action_cb(const std_msgs::Int64& msg)
@@ -90,23 +96,28 @@ void action_cb(const std_msgs::Int64& msg)
 
 void publish()
 {
+  int a5 = analogRead(A5);
   state.data[0] = robot.pr.on;
   state.data[1] = robot.ms.left.data;
   state.data[2] = robot.ms.mid.data;
   state.data[3] = robot.ms.right.data;
   state.data[4] = map(robot.pr.volt, 0, 1023, -128, 127);
-  state.data[5] = IrReceiver.decodedIRData.protocol & 0xFF;
-  // memcpy(state.data[6], &IrReceiver.decodedIRData.decodedRawData, 4);
-  state.data[6] = (IrReceiver.decodedIRData.decodedRawData >> 24) & 0xFF;
-  state.data[7] = (IrReceiver.decodedIRData.decodedRawData >> 16) & 0xFF;
-  state.data[8] = (IrReceiver.decodedIRData.decodedRawData >> 8) & 0xFF;
-  state.data[9] = (IrReceiver.decodedIRData.decodedRawData >> 0) & 0xFF;
-  // state.data[6] = (IrReceiver.decodedIRData.address >> 8) & 0xFF;
-  // state.data[7] = IrReceiver.decodedIRData.address        & 0xFF;
-  // state.data[8] = (IrReceiver.decodedIRData.command >> 8) & 0xFF;
-  // state.data[9] = IrReceiver.decodedIRData.command        & 0xFF;
-  state.data[10] += 1;
+  if (robot.duty_cycle_ir > 0.5 && robot.duty_cycle_ir < 0.7)
+  {
+    state.data[5] = 1;
+    state.data[6] = 0;
+  }
+  else if (robot.duty_cycle_ir > 0.75 && robot.duty_cycle_ir < 0.85)
+  {
+    state.data[5] = 0;
+    state.data[6] = 1;
+  }
+  else{
+    state.data[5] = 0;
+    state.data[6] = 0;
+  }
+  state.data[7] = (byte)(robot.duty_cycle_ir * 100.0);
+  state.data[8] += 1;
 
-  // state.data[6] = -1;
   state_pub.publish(&state);
 }

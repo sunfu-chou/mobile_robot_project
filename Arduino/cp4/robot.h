@@ -6,10 +6,7 @@
 #include <L298NX2.h>
 #include <PID_v1.h>
 
-#include "PinDefinitionsAndMore.h"
-#include <IRremote.hpp>
-
-// #define DECODE_NEC
+#define BUF_LEN 100
 
 class Robot
 {
@@ -21,6 +18,9 @@ public:
            { 0.0, 0.0, 0.0, PID(&pid.right.feedback, &pid.right.output, &pid.right.setpoint, 300, 870, 0.00, DIRECT) } }
     , ms{ { 7, 0 }, { 13, 0 }, { A1, 0 } }
     , pr{ A2, A3, 0, 0 }
+    , ind_ir_buf(0)
+    , ir_buf{ 0 }
+    , duty_cycle_ir(0)
   {
     pid.left.handle.SetOutputLimits(-255, 255);
     pid.right.handle.SetOutputLimits(-255, 255);
@@ -178,16 +178,13 @@ public:
     }
   } pr;
 
-  void init(){
+  void init()
+  {
     ms.init();
-    IrReceiver.begin(IR_RECEIVE_PIN, DISABLE_LED_FEEDBACK);
   }
 
   void run()
   {
-    if (IrReceiver.decode()) {
-      IrReceiver.resume();
-    }
     ms.read();
     pr.reada();
     pr.readd();
@@ -195,6 +192,24 @@ public:
     pid.set_feedback(enc.left.diff, enc.right.diff);
     pid.compute();
     motors.drive(pid.left.output, pid.right.output);
+  }
+
+  byte ir_buf[BUF_LEN];
+  int ind_ir_buf;
+  double duty_cycle_ir;
+  void readIR()
+  {
+    ir_buf[ind_ir_buf++] = digitalRead(A5);
+    if (ind_ir_buf == BUF_LEN)
+      ind_ir_buf = 0;
+
+    duty_cycle_ir = 0;
+    for (int i = 0; i < BUF_LEN; ++i)
+    {
+      duty_cycle_ir += (double)ir_buf[i] / BUF_LEN;
+    }
+
+
   }
 };
 
