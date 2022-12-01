@@ -128,7 +128,7 @@ int main(int argc, char** argv)
             // s = stop
             // do_action(st);
             state = gotBall;
-            do_action(fw);
+            // do_action(fw);
           }
           else
           {
@@ -186,6 +186,7 @@ int main(int argc, char** argv)
           if (mid != 1)
             state = forward;
           else
+            do_action(fw);
             state = scanLeftBeacon;
         }
       }
