@@ -190,13 +190,16 @@ int main(int argc, char** argv)
         {
           if (mid != 1)
             state = forward;
-          else{
+          else
+          {
             current_time = ros::Time::now();
-            if(current_time.toSec() - got_ball_time.toSec() > 1.0){
+            if (current_time.toSec() - got_ball_time.toSec() < 1.0)
+            {
               state = scanLeftBeacon;
-              got_ball_time = ros::Time::now();
             }
-            else{
+            else
+            {
+              got_ball_time = ros::Time::now();
               do_action(fw);
             }
           }
