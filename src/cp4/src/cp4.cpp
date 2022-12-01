@@ -195,12 +195,12 @@ int main(int argc, char** argv)
             current_time = ros::Time::now();
             if (current_time.toSec() - got_ball_time.toSec() < 1.0)
             {
-              state = scanLeftBeacon;
+              do_action(fw);
             }
             else
             {
               got_ball_time = ros::Time::now();
-              do_action(fw);
+              state = scanLeftBeacon;
             }
           }
         }
