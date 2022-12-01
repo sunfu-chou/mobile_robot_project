@@ -199,16 +199,12 @@ public:
   double duty_cycle_ir;
   void readIR()
   {
-    ir_buf[ind_ir_buf++] = digitalRead(A5);
-    if (ind_ir_buf == BUF_LEN)
+    duty_cycle_ir -= (double)ir_buf[ind_ir_buf] / BUF_LEN;
+    ir_buf[ind_ir_buf] = digitalRead(A5);
+    duty_cycle_ir += (double)ir_buf[ind_ir_buf] / BUF_LEN;
+
+    if (++ind_ir_buf == BUF_LEN)
       ind_ir_buf = 0;
-
-    duty_cycle_ir = 0;
-    for (int i = 0; i < BUF_LEN; ++i)
-    {
-      duty_cycle_ir += (double)ir_buf[i] / BUF_LEN;
-    }
-
 
   }
 };

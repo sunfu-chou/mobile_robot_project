@@ -15,7 +15,7 @@ void publish();
 
 std_msgs::ByteMultiArray state;
 
-#define STATE_ARR_LEN 20
+#define STATE_ARR_LEN 10
 int8_t state_arr[STATE_ARR_LEN];
 ros::Publisher state_pub("state", &state);
 
@@ -96,7 +96,6 @@ void action_cb(const std_msgs::Int64& msg)
 
 void publish()
 {
-  int a5 = analogRead(A5);
   state.data[0] = robot.pr.on;
   state.data[1] = robot.ms.left.data;
   state.data[2] = robot.ms.mid.data;
