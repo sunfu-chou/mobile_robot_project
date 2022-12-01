@@ -64,8 +64,8 @@ void action_cb(const std_msgs::Int64& msg)
 {
   if (msg.data == 1)
   {
-    leftsp = 6;
-    rightsp = 6;
+    leftsp = 5;
+    rightsp = 5;
     return;
   }
   else if (msg.data == 4)
