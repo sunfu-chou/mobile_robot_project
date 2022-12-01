@@ -199,7 +199,6 @@ int main(int argc, char** argv)
             }
             else
             {
-              got_ball_time = ros::Time::now();
               state = scanLeftBeacon;
             }
           }
@@ -227,6 +226,7 @@ int main(int argc, char** argv)
           count += 1;
           ros::spinOnce();
         }
+        got_ball_time = ros::Time::now();
         state = gotBall;
       }
       // arduino_return_state = false;
