@@ -26,6 +26,8 @@ int rotate_times = 21;
 double begin = 0;
 double now = 0;
 double last_time = 0.5;
+ros::Time got_ball_time;
+ros::Time current_time;
 std_msgs::Int64 action;
 
 void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr)
@@ -127,6 +129,7 @@ int main(int argc, char** argv)
           {
             // s = stop
             // do_action(st);
+            got_ball_time = ros::Time::now();
             state = gotBall;
             // do_action(fw);
           }
@@ -148,6 +151,7 @@ int main(int argc, char** argv)
         }
         state = forward;
       }
+
       if (state == scanLeft)
       {
         int count = 0;
@@ -160,8 +164,10 @@ int main(int argc, char** argv)
         }
         state = forward;
       }
+
       if (state == gotBall)
       {
+        current_time = ros::Time::now();
         if (right == 1 || left == 1)
         {
           if (right == 1 && left == 1)
@@ -186,8 +192,13 @@ int main(int argc, char** argv)
           if (mid != 1)
             state = forward;
           else
-            do_action(fw);
-            state = scanLeftBeacon;
+            if(current_time.toSec() - got_ball_time.toSec() > 3.0){
+              state = scanLeftBeacon;
+              got_ball_time = ros::Time::now();
+            }
+            else{
+              do_action(fw);
+            }
         }
       }
       if (state == scanRightBeacon)
