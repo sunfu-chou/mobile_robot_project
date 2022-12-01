@@ -193,7 +193,7 @@ int main(int argc, char** argv)
           else
           {
             current_time = ros::Time::now();
-            if (current_time.toSec() - got_ball_time.toSec() < 1.0)
+            if (current_time.toSec() - got_ball_time.toSec() < 0.8)
             {
               do_action(fw);
             }
