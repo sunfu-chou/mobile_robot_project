@@ -1,10 +1,12 @@
 <launch>
   <arg name="beacon" default="5"/>
+  <arg name="th" default="20"/>
   <arg name="port" default="0"/>
   <node pkg="cp4" type="cp4" name="cp4" output="screen">
     <!-- 5 for 600 -->
     <!-- 6 for 1500 -->
     <param name="beacon" value="$(arg beacon)"/>
+    <param name="th" value="$(arg th)"/>
   </node>
 
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">

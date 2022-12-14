@@ -14,6 +14,7 @@ ros::Publisher action_pub;
 
 // ros param
 int ind_beacon = 0;
+int th = 0;
 
 int photo = 0;
 int left = 0;
@@ -33,7 +34,8 @@ std_msgs::Int64 action;
 void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr)
 {
   // ROS_INFO_STREAM("Num received from Arduino is: " << ptr->data);
-  photo = 1 - ptr->data[0];
+  // photo = 1 - ptr->data[0];
+  photo = !(ptr -> data[4] > th);
   left = 1 - ptr->data[1];
   mid = 1 - ptr->data[2];
   right = 1 - ptr->data[3];
@@ -67,6 +69,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh_local("~");
 
   nh_local.param<int>("beacon", ind_beacon, 5);
+  nh_local.param<int>("th", th, 20);
 
   begin = ros::Time::now().toSec();
   now = ros::Time::now().toSec();
@@ -192,7 +195,7 @@ int main(int argc, char** argv)
             state = forward;
           else{
             current_time = ros::Time::now();
-            if(current_time.toSec() - got_ball_time.toSec() > 1.0){
+            if(current_time.toSec() - got_ball_time.toSec() > 3.0){
               state = scanLeftBeacon;
               got_ball_time = ros::Time::now();
             }
