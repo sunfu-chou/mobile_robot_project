@@ -193,15 +193,18 @@ int main(int argc, char** argv)
         {
           if (mid != 1)
             state = forward;
-          else{
+          else
+          {
             current_time = ros::Time::now();
-            if(current_time.toSec() - got_ball_time.toSec() > 3.0){
-              state = scanLeftBeacon;
-              got_ball_time = ros::Time::now();
-            }
-            else{
+            if (current_time.toSec() - got_ball_time.toSec() < 3.0)
+            {
               do_action(fw);
             }
+            else
+            {
+              state = scanLeftBeacon;
+            }
+          }
           }
         }
       }
@@ -227,6 +230,7 @@ int main(int argc, char** argv)
           count += 1;
           ros::spinOnce();
         }
+        got_ball_time = ros::Time::now();
         state = gotBall;
       }
       // arduino_return_state = false;

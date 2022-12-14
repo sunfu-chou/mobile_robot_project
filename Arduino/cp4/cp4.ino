@@ -76,14 +76,14 @@ void action_cb(const std_msgs::Int64& msg)
   }
   else if (msg.data == 3)
   {
-    leftsp = -2;
-    rightsp = 2;
+    leftsp = -1.5;
+    rightsp = 1.5;
     return;
   }
   else if (msg.data == 2)
   {
-    leftsp = 2;
-    rightsp = -2;
+    leftsp = 1.5;
+    rightsp = -1.5;
     return;
   }
   else if (msg.data == 0)
