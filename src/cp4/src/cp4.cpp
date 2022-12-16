@@ -35,7 +35,7 @@ void state_cb(const std_msgs::ByteMultiArray::ConstPtr& ptr)
 {
   // ROS_INFO_STREAM("Num received from Arduino is: " << ptr->data);
   // photo = 1 - ptr->data[0];
-  photo = !(ptr -> data[4] > th);
+  photo = !(ptr->data[4] > th);
   left = 1 - ptr->data[1];
   mid = 1 - ptr->data[2];
   right = 1 - ptr->data[3];
@@ -204,7 +204,6 @@ int main(int argc, char** argv)
             {
               state = scanLeftBeacon;
             }
-          }
           }
         }
       }
