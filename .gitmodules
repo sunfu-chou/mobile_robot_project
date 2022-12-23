@@ -4,9 +4,9 @@
 [submodule "src/ydlidar_ros_driver"]
 	path = src/ydlidar_ros_driver
 	url = git@github.com:sunfu-chou/ydlidar_ros_driver.git
-[submodule "src/RTIMULib"]
-	path = src/RTIMULib
-	url = git@github.com:smukkejohan/RTIMULib.git
 [submodule "src/rtimulib_ros"]
 	path = src/rtimulib_ros
-	url = git@github.com:romainreignier/rtimulib_ros.git
+	url = git@github.com:sunfu-chou/rtimulib_ros.git
+[submodule "src/RTIMULib2"]
+	path = src/RTIMULib2
+	url = git@github.com:HongshiTan/RTIMULib2.git
