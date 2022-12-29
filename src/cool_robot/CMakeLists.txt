@@ -134,6 +134,9 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(odom_pub src/odom_pub.cpp)
 target_link_libraries(odom_pub ${catkin_LIBRARIES})
+
+add_executable(cmd_vel_transformaer src/cmd_vel_transformaer.cpp)
+target_link_libraries(cmd_vel_transformaer ${catkin_LIBRARIES})
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
