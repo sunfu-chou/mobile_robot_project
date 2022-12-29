@@ -1,4 +1,4 @@
 <launch>
   <include file="$(find cool_robot)/launch/serial.launch"/>
-  <include file="$(find cool_robot)/launch/launch.launch"/>
+  <include file="$(find cool_robot)/launch/localization.launch"/>
 </launch>
