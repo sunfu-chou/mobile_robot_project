@@ -1,4 +1,5 @@
 <launch>
+  <include file="$(find rtimulib_ros)/launch/rtimulib_ros.launch"/>
   <node name="odom_pub" pkg="cool_robot" type="odom_pub"/>
   <node pkg="imu_calib" type="apply_calib" name="apply_calib" output="screen" clear_params="true">
     <!-- <param name="calib_file" value="$(find cool_robot)/params/imu_calib.yaml" /> -->
