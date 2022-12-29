@@ -2,5 +2,6 @@
   <include file="$(find cool_robot)/launch/serial.launch"/>
   <include file="$(find cool_robot)/launch/localization.launch"/>
   <include file="$(find cool_robot)/launch/lidar.launch"/>
+  <include file="$(find cool_robot)/launch/nav.launch"/>
   <include file="$(find iris_lama_ros)/launch/slam.launch"/>
 </launch>

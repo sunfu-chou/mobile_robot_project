@@ -5,4 +5,5 @@
     <param name="port" value="$(arg port)" />
     <param name="baud" value="$(arg baud)" />
   </node>
+  <node name="cmd_vel_transformaer" pkg="cool_robot" type="cmd_vel_transformaer"/>
 </launch>
