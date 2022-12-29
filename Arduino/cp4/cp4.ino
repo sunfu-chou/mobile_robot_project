@@ -62,10 +62,13 @@ void loop()
 
 void action_cb(const std_msgs::Int64& msg)
 {
-  if (msg.data == 1)
-  {
-    leftsp = 7;
-    rightsp = 7;
+      leftsp = 2;
+    rightsp = 2;
+    return;
+    if (msg.data == 1)
+    {
+    leftsp = 2;
+    rightsp = 2;
     return;
   }
   else if (msg.data == 4)
@@ -117,6 +120,7 @@ void publish()
     state.data[5] = 0;
     state.data[6] = 0;
   }
+  state.data[6] = robot.enc.right.diff;
   state.data[7] = (byte)(robot.duty_cycle_ir * 100.0);
   state.data[8] += 1;
 

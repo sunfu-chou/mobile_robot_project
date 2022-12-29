@@ -1,0 +1,3 @@
+<launch>
+  <node name="odom_pub" pkg="cool_robot" type="odom_pub"/>
+</launch>

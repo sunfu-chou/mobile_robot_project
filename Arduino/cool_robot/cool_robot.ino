@@ -1,124 +1,83 @@
 #include <Arduino.h>
 
 #include <ros.h>
-#include <std_msgs/ByteMultiArray.h>
-#include <std_msgs/Byte.h>
-#include <std_msgs/Int64.h>
+#include <ros/time.h>
+#include <std_msgs/Float32MultiArray.h>
 
 #include "robot.h"
 
 ros::NodeHandle nh;
 Robot robot;
+float vel_l, vel_r;
+// vx, wz
+#define LEN_CMD_VEL 2
+float cmd_vel_data[LEN_CMD_VEL] = {};
+std_msgs::Float32MultiArray cmd_vel;
 
-void action_cb(const std_msgs::Int64& msg);
-void publish();
+void cmd_vel_cb(const std_msgs::Float32MultiArray& msg);
+ros::Subscriber<std_msgs::Float32MultiArray> cmd_vel_sub("cmd_vel", &cmd_vel_cb);
 
-std_msgs::ByteMultiArray state;
+// seq, vx, wz
+#define LEN_BASE_VEL 8
+float base_vel_data[LEN_BASE_VEL] = {};
+std_msgs::Float32MultiArray base_vel;
 
-#define STATE_ARR_LEN 10
-int8_t state_arr[STATE_ARR_LEN];
-ros::Publisher state_pub("state", &state);
-
-ros::Subscriber<std_msgs::Int64> action_sub("action", &action_cb);
+void publish_base_vel();
+ros::Publisher base_vel_pub("base_vel", &base_vel);
 
 unsigned long MillisTasks10 = 0;
 unsigned long MillisTasks1 = 0;
 
-double leftsp, rightsp;
+float leftsp, rightsp;
 
 void setup()
 {
-  leftsp = 0;
-  rightsp = 0;
-  state.data = state_arr;
-  state.data_length = STATE_ARR_LEN;
-  robot.init();
-  robot.pid.set_setpoint(0, 0);
+  cmd_vel.data_length = LEN_CMD_VEL;
+  cmd_vel.data = cmd_vel_data;
+  base_vel.data_length = LEN_BASE_VEL;
+  base_vel.data = base_vel_data;
   nh.initNode();
-  nh.advertise(state_pub);
-  nh.subscribe(action_sub);
+  nh.advertise(base_vel_pub);
+  nh.subscribe(cmd_vel_sub);
 }
 
 void loop()
 {
   unsigned long currentMillis = millis();
   nh.spinOnce();
-
-  robot.pid.set_setpoint(-rightsp, -leftsp);
-  robot.readIR();
-
+  robot.pid.set_setpoint(vel_l * 0.62134089783, vel_r * 0.69);
   if (currentMillis - MillisTasks1 >= 1l)
   {
     MillisTasks1 = currentMillis;
     robot.run();
   }
 
-  if (currentMillis - MillisTasks10 >= 100l)
+  if (currentMillis - MillisTasks10 >= 1000l / 30l)
   {
     MillisTasks10 = currentMillis;
-    publish();
+    publish_base_vel();
   }
 }
 
-void action_cb(const std_msgs::Int64& msg)
+void cmd_vel_cb(const std_msgs::Float32MultiArray& msg)
 {
-  if (msg.data == 1)
-  {
-    leftsp = 7;
-    rightsp = 7;
-    return;
-  }
-  else if (msg.data == 4)
-  {
-    leftsp = -3;
-    rightsp = -3;
-    return;
-  }
-  else if (msg.data == 3)
-  {
-    leftsp = -1.5;
-    rightsp = 1.5;
-    return;
-  }
-  else if (msg.data == 2)
-  {
-    leftsp = 1.5;
-    rightsp = -1.5;
-    return;
-  }
-  else if (msg.data == 0)
-  {
-    leftsp = 0;
-    rightsp = 0;
-    return;
-  }
+  vel_l = (msg.data[0] - 0.5 * msg.data[1] * 0.149) / 0.032;
+  vel_r = (msg.data[0] + 0.5 * msg.data[1] * 0.149) / 0.032;
 }
 
-void publish()
+void publish_base_vel()
 {
-  state.data[0] = robot.pr.on;
-  state.data[1] = robot.ms.left.data;
-  state.data[2] = robot.ms.mid.data;
-  state.data[3] = robot.ms.right.data;
-  state.data[4] = map(robot.pr.volt, 0, 1023, -128, 127);
-  // 5 for 600
-  // 6 for 1500
-  if (robot.duty_cycle_ir > 0.5 && robot.duty_cycle_ir < 0.7)
-  {
-    state.data[5] = 1;
-    state.data[6] = 0;
-  }
-  else if (robot.duty_cycle_ir > 0.75 && robot.duty_cycle_ir < 0.85)
-  {
-    state.data[5] = 0;
-    state.data[6] = 1;
-  }
-  else{
-    state.data[5] = 0;
-    state.data[6] = 0;
-  }
-  state.data[7] = (byte)(robot.duty_cycle_ir * 100.0);
-  state.data[8] += 1;
+  base_vel.data[0] += 1;
+  base_vel.data[1] = 0.0;
+  // angular velocity during two serial frame
 
-  state_pub.publish(&state);
+  base_vel.data[2] = (robot.encoder.left.now - base_vel.data[4]) / 621.34089783 * 30.0;
+  base_vel.data[3] = (robot.encoder.right.now - base_vel.data[5]) / 621.34089783 * 30.0;
+  // angular pose at now serial frame
+  base_vel.data[4] = (robot.encoder.left.now);
+  base_vel.data[5] = (robot.encoder.right.now);
+  // angular velocity at last encoder read
+  base_vel.data[6] = robot.pid.left.output;
+  base_vel.data[7] = robot.pid.right.output;
+  base_vel_pub.publish(&base_vel);
 }
