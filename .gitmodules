@@ -16,3 +16,6 @@
 [submodule "src/iris_lama"]
 	path = src/iris_lama
 	url = git@github.com:iris-ua/iris_lama.git
+[submodule "src/imu_calib"]
+	path = src/imu_calib
+	url = git@github.com:sunfu-chou/imu_calib.git
