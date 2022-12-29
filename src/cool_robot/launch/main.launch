@@ -1,4 +1,5 @@
 <launch>
   <include file="$(find cool_robot)/launch/serial.launch"/>
   <include file="$(find cool_robot)/launch/localization.launch"/>
+  <include file="$(find cool_robot)/launch/lidar.launch"/>
 </launch>
