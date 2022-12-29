@@ -1,13 +1,22 @@
 <launch>
-  <include file="$(find rtimulib_ros)/launch/rtimulib_ros.launch"/>
-  <node name="odom_pub" pkg="cool_robot" type="odom_pub"/>
+  <node pkg="rtimulib_ros" type="rtimulib_ros" name="rtimulib_node" output="screen">
+    <param name="use_compass" value="false"/>
+    <param name="calibration_file_path" value="$(find cool_robot)/config"/>
+    <param name="calibration_file_name" value="RTIMULib" />
+    <param name="frame_id" value="base_link"/>
+    <remap from="rtimulib_node" to="imu/raw"/>
+  </node>
+
   <node pkg="imu_calib" type="apply_calib" name="apply_calib" output="screen" clear_params="true">
     <!-- <param name="calib_file" value="$(find cool_robot)/params/imu_calib.yaml" /> -->
     <param name="calibrate_gyros" value="true" />
+    <param name="calibrate_acc" value="true" />
     <param name="gyro_calib_samples" value="200" />
-    <remap from="raw" to="uwb_imu_raw" />
-    <remap from="corrected" to="uwb_imu_calibed" />
+    <param name="acc_calib_samples" value="200" />
+    <remap from="raw" to="imu/raw" />
+    <remap from="corrected" to="imu" />
   </node>
+
   <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_node" output="screen" clear_params="true">
     <param name="publish_tf" value="false" />
     <param name="use_mag" value="false" />
@@ -17,6 +26,9 @@
     <remap from="imu/data_raw" to="uwb_imu_calibed" />
     <remap from="imu/data" to="uwb_imu" />
   </node>
+  
+  <node name="odom_pub" pkg="cool_robot" type="odom_pub"/>
+
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true">
     <rosparam command="load" file="$(find cool_robot)/config/ekf.yaml" />
 
