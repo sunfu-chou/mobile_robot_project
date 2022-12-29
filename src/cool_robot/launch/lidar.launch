@@ -33,5 +33,5 @@
     <!-- frequency is invalid, External PWM control speed -->
     <param name="frequency" type="double" value="6.0"/>
   </node>
-  <node name="base_to_laser" pkg="tf2_ros" type="static_transform_publisher" args="-0.05 0 0 0 0 3.1416 base_link laser_frame"/>
+  <node name="base_to_laser" pkg="tf2_ros" type="static_transform_publisher" args="-0.05 0 0 3.1416 0 0.0 base_link laser_frame"/>
 </launch>

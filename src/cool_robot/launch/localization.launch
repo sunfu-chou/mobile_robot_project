@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="rtimulib_ros" type="rtimulib_ros" name="rtimulib_node" output="screen">
+  <!-- <node pkg="rtimulib_ros" type="rtimulib_ros" name="rtimulib_node" output="screen">
     <param name="use_compass" value="false"/>
     <param name="calibration_file_path" value="$(find cool_robot)/config"/>
     <param name="calibration_file_name" value="RTIMULib" />
@@ -25,7 +25,7 @@
 
     <remap from="imu/data_raw" to="imu/corrected" />
     <remap from="imu/data" to="imu" />
-  </node>
+  </node> -->
   
   <node name="odom_pub" pkg="cool_robot" type="odom_pub"/>
 
