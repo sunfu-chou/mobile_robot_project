@@ -9,7 +9,7 @@ void arrayCb(std_msgs::Float32MultiArray::ConstPtr array_ptr)
   odom.child_frame_id = "base_link";
   odom.header.frame_id = "odom";
   double vx = 0.032 * (array_ptr->data[2] + array_ptr->data[3] * 0.9) / 2;
-  double wz = 0.032 * (-array_ptr->data[2] + array_ptr->data[3] * 0.9) / 0.149;
+  double wz = 0.032 * (-array_ptr->data[2] + array_ptr->data[3] * 0.9) / 0.13;
   odom.twist.twist.linear.x = vx;
   odom.twist.twist.angular.z = wz;
   // clang-format off

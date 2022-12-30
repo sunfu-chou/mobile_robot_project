@@ -8,7 +8,7 @@ TebLocalPlannerROS:
   dt_hysteresis: 0.015
   min_samples: 3
   global_plan_overwrite_orientation: true
-  max_global_plan_lookahead_dist: 1.0
+  max_global_plan_lookahead_dist: 2.0
   force_reinit_new_goal_dist: 1.0
   feasibility_check_no_poses: 5
   publish_feedback: false
@@ -21,9 +21,9 @@ TebLocalPlannerROS:
 
   # Robot
 
-  max_vel_x: 0.25
-  max_vel_x_backwards: 0.25
-  max_vel_theta: 3
+  max_vel_x: 0.17
+  max_vel_x_backwards: 0.17
+  max_vel_theta: 1.8
   acc_lim_x: 0.5
   acc_lim_theta: 2
 
@@ -33,14 +33,14 @@ TebLocalPlannerROS:
 
   # GoalTolerance
 
-  xy_goal_tolerance: 0.2
-  yaw_goal_tolerance: 0.2
+  xy_goal_tolerance: 0.25
+  yaw_goal_tolerance: 2
   free_goal_vel: false
 
   # Obstacles
 
-  min_obstacle_dist: 0.1
-  inflation_dist: 0.1
+  min_obstacle_dist: 0.20
+  inflation_dist: 0.15
   include_dynamic_obstacles: true
   include_costmap_obstacles: true
   costmap_obstacles_behind_robot_dist: 1.0
